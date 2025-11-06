@@ -113,6 +113,9 @@ export default function PortfolioTheory() {
   const [showPairwiseFrontiers, setShowPairwiseFrontiers] = useState(true); // Toggle visibility of pairwise efficient frontiers
   const [riskFreeRate, setRiskFreeRate] = useState(0.03); // Risk-free rate (default 3%)
   const [investmentAmount, setInvestmentAmount] = useState(100000); // Investment amount for dollar value breakdown
+  const [showRf, setShowRf] = useState(true); // Toggle visibility of Risk-free rate point
+  const [showCML, setShowCML] = useState(true); // Toggle visibility of Capital Market Line
+  const [chartZoom, setChartZoom] = useState(1); // Chart zoom level (0.5 to 2)
 
   // Practice Problems State
   const [expandedProblems, setExpandedProblems] = useState({});
@@ -2547,6 +2550,83 @@ export default function PortfolioTheory() {
                                 </div>
                               </div>
                             )}
+
+                            {/* Risk-Free Rate Point Toggle */}
+                            <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-emerald-900">Risk-Free Point (Rf)</span>
+                                <button
+                                  onClick={() => setShowRf(!showRf)}
+                                  className={`px-3 py-1 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                                    showRf
+                                      ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                  }`}
+                                >
+                                  {showRf ? 'ON' : 'OFF'}
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Capital Market Line Toggle */}
+                            <div className="bg-sky-50 rounded-lg p-3 border border-sky-200">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-semibold text-sky-900">Capital Market Line (CML)</span>
+                                <button
+                                  onClick={() => setShowCML(!showCML)}
+                                  className={`px-3 py-1 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                                    showCML
+                                      ? 'bg-sky-500 text-white hover:bg-sky-600'
+                                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                  }`}
+                                >
+                                  {showCML ? 'ON' : 'OFF'}
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Chart Zoom Control */}
+                            <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-semibold text-purple-900">Chart Zoom</span>
+                                <span className="text-lg font-bold text-purple-700">{(chartZoom * 100).toFixed(0)}%</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => setChartZoom(Math.max(0.5, chartZoom - 0.1))}
+                                  className="px-2 py-1 bg-purple-200 hover:bg-purple-300 rounded text-purple-900 font-bold text-sm"
+                                  disabled={chartZoom <= 0.5}
+                                >
+                                  −
+                                </button>
+                                <input
+                                  type="range"
+                                  min="0.5"
+                                  max="2"
+                                  step="0.1"
+                                  value={chartZoom}
+                                  onChange={(e) => setChartZoom(parseFloat(e.target.value))}
+                                  className="flex-1 h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                                />
+                                <button
+                                  onClick={() => setChartZoom(Math.min(2, chartZoom + 0.1))}
+                                  className="px-2 py-1 bg-purple-200 hover:bg-purple-300 rounded text-purple-900 font-bold text-sm"
+                                  disabled={chartZoom >= 2}
+                                >
+                                  +
+                                </button>
+                                <button
+                                  onClick={() => setChartZoom(1)}
+                                  className="px-2 py-1 bg-purple-500 hover:bg-purple-600 rounded text-white text-xs font-semibold"
+                                >
+                                  Reset
+                                </button>
+                              </div>
+                              <div className="flex justify-between text-xs text-gray-600 mt-1">
+                                <span>50%</span>
+                                <span>200%</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -2581,8 +2661,8 @@ export default function PortfolioTheory() {
                             const chartMaxReturn = maxReturn + returnPadding;
 
                             // Chart dimensions
-                            const chartWidth = 800;
-                            const chartHeight = 500;
+                            const chartWidth = 800 * chartZoom;
+                            const chartHeight = 500 * chartZoom;
                             const margin = { top: 20, right: 20, bottom: 60, left: 80 };
                             const plotWidth = chartWidth - margin.left - margin.right;
                             const plotHeight = chartHeight - margin.top - margin.bottom;
@@ -2880,7 +2960,7 @@ export default function PortfolioTheory() {
                                     })()}
 
                                     {/* Risk-Free Asset */}
-                                    {(() => {
+                                    {showRf && (() => {
                                       const rfX = scaleX(0);
                                       const rfY = scaleY(riskFreeRate);
 
@@ -2906,7 +2986,7 @@ export default function PortfolioTheory() {
                                     })()}
 
                                     {/* Capital Market Line (CML) - from risk-free to Tangency Portfolio */}
-                                    {tangencyPortfolio && currentPortfolio && (() => {
+                                    {showCML && tangencyPortfolio && currentPortfolio && (() => {
                                       const rfX = scaleX(0);
                                       const rfY = scaleY(riskFreeRate);
                                       const tangencyX = scaleX(tangencyPortfolio.risk);
