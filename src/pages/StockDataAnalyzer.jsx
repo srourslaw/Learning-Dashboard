@@ -538,12 +538,17 @@ export default function StockDataAnalyzer() {
                           <XAxis
                             dataKey="date"
                             stroke="#6366f1"
-                            tick={{ fill: '#4338ca' }}
+                            tick={{ fill: '#4338ca', fontSize: 11 }}
+                            angle={-45}
+                            textAnchor="end"
+                            height={80}
+                            interval="preserveStartEnd"
                           />
                           <YAxis
                             stroke="#6366f1"
                             tick={{ fill: '#4338ca' }}
                             domain={['dataMin - 5', 'dataMax + 5']}
+                            tickFormatter={(value) => `$${value.toFixed(0)}`}
                           />
                           <Tooltip
                             contentStyle={{ backgroundColor: '#fff', border: '2px solid #4f46e5', borderRadius: '8px' }}
@@ -608,8 +613,16 @@ export default function StockDataAnalyzer() {
                       <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={stockData.incomeStatement}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#d1fae5" />
-                          <XAxis dataKey="period" stroke="#059669" />
-                          <YAxis stroke="#059669" />
+                          <XAxis
+                            dataKey="period"
+                            stroke="#059669"
+                            tick={{ fill: '#059669' }}
+                          />
+                          <YAxis
+                            stroke="#059669"
+                            tick={{ fill: '#059669' }}
+                            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
+                          />
                           <Tooltip
                             contentStyle={{ backgroundColor: '#fff', border: '2px solid #10b981', borderRadius: '8px' }}
                             formatter={(value) => [formatLargeCurrency(value), '']}
@@ -668,8 +681,16 @@ export default function StockDataAnalyzer() {
                       <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={stockData.balanceSheet}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#dbeafe" />
-                          <XAxis dataKey="period" stroke="#0284c7" />
-                          <YAxis stroke="#0284c7" />
+                          <XAxis
+                            dataKey="period"
+                            stroke="#0284c7"
+                            tick={{ fill: '#0284c7' }}
+                          />
+                          <YAxis
+                            stroke="#0284c7"
+                            tick={{ fill: '#0284c7' }}
+                            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
+                          />
                           <Tooltip
                             contentStyle={{ backgroundColor: '#fff', border: '2px solid #0ea5e9', borderRadius: '8px' }}
                             formatter={(value) => [formatLargeCurrency(value), '']}
@@ -728,8 +749,16 @@ export default function StockDataAnalyzer() {
                       <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={stockData.cashFlow}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f3e8ff" />
-                          <XAxis dataKey="period" stroke="#9333ea" />
-                          <YAxis stroke="#9333ea" />
+                          <XAxis
+                            dataKey="period"
+                            stroke="#9333ea"
+                            tick={{ fill: '#9333ea' }}
+                          />
+                          <YAxis
+                            stroke="#9333ea"
+                            tick={{ fill: '#9333ea' }}
+                            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
+                          />
                           <Tooltip
                             contentStyle={{ backgroundColor: '#fff', border: '2px solid #a855f7', borderRadius: '8px' }}
                             formatter={(value) => [formatLargeCurrency(value), '']}
