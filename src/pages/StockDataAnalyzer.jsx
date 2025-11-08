@@ -537,16 +537,31 @@ export default function StockDataAnalyzer() {
             <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border-2 border-indigo-200 z-50 overflow-hidden animate-in slide-in-from-top-2 duration-300">
               {/* Search Bar */}
               <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b-2 border-indigo-200">
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-600" />
-                  <input
-                    type="text"
-                    placeholder="Search by company name, symbol, or sector..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-indigo-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base"
-                    autoFocus
-                  />
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-600" />
+                    <input
+                      type="text"
+                      placeholder="Search by company name, symbol, or sector..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-12 pr-4 py-3 border-2 border-indigo-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base"
+                      autoFocus
+                    />
+                  </div>
+                  {selectedCompanies.length > 0 && (
+                    <button
+                      onClick={() => {
+                        setSelectedCompanies([]);
+                        setCompaniesData({});
+                        setPortfolioWeights({});
+                      }}
+                      className="px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold transition-colors flex items-center gap-2 whitespace-nowrap"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Clear All
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -709,6 +724,255 @@ export default function StockDataAnalyzer() {
                 })}
               </div>
             </div>
+
+            {/* Individual Company Analysis Sections */}
+            {selectedCompanies.map((company) => {
+              const data = companiesData[company.symbol];
+              if (!data) return null;
+
+              return (
+                <div key={company.symbol} className="space-y-6">
+                  {/* Company Header */}
+                  <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 shadow-xl text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h2 className="text-3xl font-bold mb-2">{company.name}</h2>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xl font-semibold">{company.symbol.replace('.AX', '')}</span>
+                          <span className="px-3 py-1 bg-white/20 rounded-lg text-sm font-medium">{company.sector}</span>
+                        </div>
+                      </div>
+                      {data.quote && (
+                        <div className="text-right">
+                          <p className="text-4xl font-bold">{formatCurrency(data.quote.price)}</p>
+                          <p className={`text-lg font-semibold ${data.quote.change >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                            {data.quote.change >= 0 ? '▲' : '▼'} {formatCurrency(Math.abs(data.quote.change))} ({formatNumber(Math.abs(data.quote.changePercent))}%)
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Historical Price Chart */}
+                  {data.historicalPrices && data.historicalPrices.length > 0 && (
+                    <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-indigo-200">
+                      <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <LineChartIcon className="w-6 h-6 text-indigo-600" />
+                        Historical Price Chart
+                      </h3>
+                      <div className="h-96">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={data.historicalPrices}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis
+                              dataKey="date"
+                              tick={{ fontSize: 12 }}
+                              interval={Math.floor(data.historicalPrices.length / 8)}
+                            />
+                            <YAxis
+                              domain={['auto', 'auto']}
+                              tick={{ fontSize: 12 }}
+                            />
+                            <Tooltip
+                              formatter={(value) => formatCurrency(value)}
+                              contentStyle={{ backgroundColor: 'white', border: '2px solid #818cf8' }}
+                            />
+                            <Legend />
+                            <Line
+                              type="monotone"
+                              dataKey="close"
+                              stroke="#6366f1"
+                              strokeWidth={2}
+                              dot={false}
+                              name="Close Price"
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Quote Details */}
+                  {data.quote && (
+                    <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-indigo-200">
+                      <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <DollarSign className="w-6 h-6 text-indigo-600" />
+                        Quote Details
+                      </h3>
+                      <div className="grid md:grid-cols-4 gap-4">
+                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                          <p className="text-sm text-gray-600 mb-1">Current Price</p>
+                          <p className="text-2xl font-bold text-gray-900">{formatCurrency(data.quote.price)}</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                          <p className="text-sm text-gray-600 mb-1">Previous Close</p>
+                          <p className="text-2xl font-bold text-gray-900">{formatCurrency(data.quote.previousClose)}</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                          <p className="text-sm text-gray-600 mb-1">Day High</p>
+                          <p className="text-2xl font-bold text-gray-900">{formatCurrency(data.quote.dayHigh)}</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                          <p className="text-sm text-gray-600 mb-1">Day Low</p>
+                          <p className="text-2xl font-bold text-gray-900">{formatCurrency(data.quote.dayLow)}</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                          <p className="text-sm text-gray-600 mb-1">Volume</p>
+                          <p className="text-2xl font-bold text-gray-900">{data.quote.volume?.toLocaleString()}</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                          <p className="text-sm text-gray-600 mb-1">Market Cap</p>
+                          <p className="text-2xl font-bold text-gray-900">{data.quote.marketCap}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Financial Statements - Income Statement */}
+                  <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-indigo-200">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <FileText className="w-6 h-6 text-indigo-600" />
+                      Income Statement
+                    </h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="bg-indigo-50">
+                            <th className="p-3 text-left text-sm font-semibold text-gray-900">Period</th>
+                            <th className="p-3 text-right text-sm font-semibold text-gray-900">Revenue</th>
+                            <th className="p-3 text-right text-sm font-semibold text-gray-900">Gross Profit</th>
+                            <th className="p-3 text-right text-sm font-semibold text-gray-900">Operating Income</th>
+                            <th className="p-3 text-right text-sm font-semibold text-gray-900">Net Income</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {generateSampleIncomeStatement().map((row, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50">
+                              <td className="p-3 text-sm font-medium text-gray-900">{row.period}</td>
+                              <td className="p-3 text-right text-sm text-gray-700">{formatLargeCurrency(row.revenue)}</td>
+                              <td className="p-3 text-right text-sm text-gray-700">{formatLargeCurrency(row.grossProfit)}</td>
+                              <td className="p-3 text-right text-sm text-gray-700">{formatLargeCurrency(row.operatingIncome)}</td>
+                              <td className="p-3 text-right text-sm font-semibold text-gray-900">{formatLargeCurrency(row.netIncome)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Financial Statements - Balance Sheet */}
+                  <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-indigo-200">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <BarChart3 className="w-6 h-6 text-indigo-600" />
+                      Balance Sheet
+                    </h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="bg-indigo-50">
+                            <th className="p-3 text-left text-sm font-semibold text-gray-900">Period</th>
+                            <th className="p-3 text-right text-sm font-semibold text-gray-900">Total Assets</th>
+                            <th className="p-3 text-right text-sm font-semibold text-gray-900">Total Liabilities</th>
+                            <th className="p-3 text-right text-sm font-semibold text-gray-900">Shareholder Equity</th>
+                            <th className="p-3 text-right text-sm font-semibold text-gray-900">Cash</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {generateSampleBalanceSheet().map((row, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50">
+                              <td className="p-3 text-sm font-medium text-gray-900">{row.period}</td>
+                              <td className="p-3 text-right text-sm text-gray-700">{formatLargeCurrency(row.totalAssets)}</td>
+                              <td className="p-3 text-right text-sm text-gray-700">{formatLargeCurrency(row.totalLiabilities)}</td>
+                              <td className="p-3 text-right text-sm font-semibold text-gray-900">{formatLargeCurrency(row.shareholderEquity)}</td>
+                              <td className="p-3 text-right text-sm text-gray-700">{formatLargeCurrency(row.cash)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Financial Statements - Cash Flow */}
+                  <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-indigo-200">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <Activity className="w-6 h-6 text-indigo-600" />
+                      Cash Flow Statement
+                    </h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="bg-indigo-50">
+                            <th className="p-3 text-left text-sm font-semibold text-gray-900">Period</th>
+                            <th className="p-3 text-right text-sm font-semibold text-gray-900">Operating Cash Flow</th>
+                            <th className="p-3 text-right text-sm font-semibold text-gray-900">Investing Cash Flow</th>
+                            <th className="p-3 text-right text-sm font-semibold text-gray-900">Financing Cash Flow</th>
+                            <th className="p-3 text-right text-sm font-semibold text-gray-900">Free Cash Flow</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {generateSampleCashFlow().map((row, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50">
+                              <td className="p-3 text-sm font-medium text-gray-900">{row.period}</td>
+                              <td className="p-3 text-right text-sm text-gray-700">{formatLargeCurrency(row.operatingCashFlow)}</td>
+                              <td className="p-3 text-right text-sm text-red-600">{formatLargeCurrency(row.investingCashFlow)}</td>
+                              <td className="p-3 text-right text-sm text-red-600">{formatLargeCurrency(row.financingCashFlow)}</td>
+                              <td className="p-3 text-right text-sm font-semibold text-gray-900">{formatLargeCurrency(row.freeCashFlow)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Key Metrics */}
+                  <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-indigo-200">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <PieChart className="w-6 h-6 text-indigo-600" />
+                      Key Metrics
+                    </h3>
+                    {(() => {
+                      const metrics = generateSampleKeyMetrics();
+                      return (
+                        <div className="grid md:grid-cols-4 gap-4">
+                          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                            <p className="text-sm text-gray-600 mb-1">P/E Ratio</p>
+                            <p className="text-2xl font-bold text-gray-900">{metrics.peRatio}</p>
+                          </div>
+                          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                            <p className="text-sm text-gray-600 mb-1">P/B Ratio</p>
+                            <p className="text-2xl font-bold text-gray-900">{metrics.pbRatio}</p>
+                          </div>
+                          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                            <p className="text-sm text-gray-600 mb-1">ROE</p>
+                            <p className="text-2xl font-bold text-gray-900">{metrics.roe}%</p>
+                          </div>
+                          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                            <p className="text-sm text-gray-600 mb-1">ROA</p>
+                            <p className="text-2xl font-bold text-gray-900">{metrics.roa}%</p>
+                          </div>
+                          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                            <p className="text-sm text-gray-600 mb-1">Debt/Equity</p>
+                            <p className="text-2xl font-bold text-gray-900">{metrics.debtToEquity}</p>
+                          </div>
+                          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                            <p className="text-sm text-gray-600 mb-1">Current Ratio</p>
+                            <p className="text-2xl font-bold text-gray-900">{metrics.currentRatio}</p>
+                          </div>
+                          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                            <p className="text-sm text-gray-600 mb-1">Dividend Yield</p>
+                            <p className="text-2xl font-bold text-gray-900">{metrics.dividendYield}%</p>
+                          </div>
+                          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-200">
+                            <p className="text-sm text-gray-600 mb-1">EPS</p>
+                            <p className="text-2xl font-bold text-gray-900">{formatCurrency(metrics.eps)}</p>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+              );
+            })}
 
             {/* Portfolio Metrics Summary */}
             {(() => {
