@@ -93,6 +93,19 @@ export default function PortfolioTheory() {
     correlation: 0.5
   });
 
+  // SML Analyzer State
+  const [smlParams, setSmlParams] = useState({
+    riskFreeRate: 3.0,
+    marketReturn: 10.0,
+    marketRisk: 15.0
+  });
+  const [smlStocks, setSmlStocks] = useState([
+    { id: 1, name: 'Apple (AAPL)', beta: 1.2, expectedReturn: 12.0 },
+    { id: 2, name: 'Tesla (TSLA)', beta: 1.8, expectedReturn: 18.0 },
+    { id: 3, name: 'Microsoft (MSFT)', beta: 1.1, expectedReturn: 9.5 },
+    { id: 4, name: 'Coca-Cola (KO)', beta: 0.6, expectedReturn: 7.0 }
+  ]);
+
   // Historical Prices State for Returns & Risk
   const [historicalPrices] = useState({
     stockA: {
@@ -1830,36 +1843,507 @@ export default function PortfolioTheory() {
                         </div>
                       </div>
 
-                      {/* Coming Soon Badge */}
-                      <div className="bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl p-8 text-white text-center shadow-lg">
-                        <Cpu className="w-16 h-16 mx-auto mb-4 animate-pulse" />
-                        <h4 className="text-2xl font-bold mb-3">🚀 Interactive SML Tool Coming Soon!</h4>
-                        <p className="text-lg mb-4">
-                          We're building a powerful tool that will let you:
-                        </p>
-                        <div className="grid md:grid-cols-2 gap-3 text-left max-w-3xl mx-auto">
-                          <div className="bg-white bg-opacity-20 rounded-lg p-3">
-                            <strong>✓ Fetch Real Yahoo Finance Data</strong>
-                            <p className="text-sm">Get live historical prices for any stock</p>
+                      {/* Interactive SML Tool */}
+                      <div className="space-y-6">
+                        {/* Market Parameters */}
+                        <div className="bg-white rounded-xl p-6 border-2 border-cyan-300 shadow-md">
+                          <h4 className="text-xl font-bold text-cyan-900 mb-4 flex items-center gap-2">
+                            <Target className="w-5 h-5" />
+                            Market Parameters
+                          </h4>
+                          <div className="grid md:grid-cols-3 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Risk-Free Rate (%)
+                              </label>
+                              <input
+                                type="number"
+                                value={smlParams.riskFreeRate}
+                                onChange={(e) => setSmlParams({...smlParams, riskFreeRate: parseFloat(e.target.value) || 0})}
+                                className="w-full p-3 border-2 border-cyan-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                                step="0.1"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Market Return (%)
+                              </label>
+                              <input
+                                type="number"
+                                value={smlParams.marketReturn}
+                                onChange={(e) => setSmlParams({...smlParams, marketReturn: parseFloat(e.target.value) || 0})}
+                                className="w-full p-3 border-2 border-cyan-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                                step="0.1"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Market Risk (σ<sub>M</sub> %)
+                              </label>
+                              <input
+                                type="number"
+                                value={smlParams.marketRisk}
+                                onChange={(e) => setSmlParams({...smlParams, marketRisk: parseFloat(e.target.value) || 0})}
+                                className="w-full p-3 border-2 border-cyan-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                                step="0.1"
+                              />
+                            </div>
                           </div>
-                          <div className="bg-white bg-opacity-20 rounded-lg p-3">
-                            <strong>✓ Auto-Calculate Beta</strong>
-                            <p className="text-sm">See beta calculated from real market data</p>
-                          </div>
-                          <div className="bg-white bg-opacity-20 rounded-lg p-3">
-                            <strong>✓ Visualize the SML</strong>
-                            <p className="text-sm">Plot stocks on the Security Market Line</p>
-                          </div>
-                          <div className="bg-white bg-opacity-20 rounded-lg p-3">
-                            <strong>✓ Identify Opportunities</strong>
-                            <p className="text-sm">See which stocks are undervalued or overvalued</p>
+                          <div className="mt-4 p-3 bg-cyan-50 rounded-lg border border-cyan-200">
+                            <p className="text-sm text-gray-700">
+                              <strong>Market Risk Premium:</strong> {(smlParams.marketReturn - smlParams.riskFreeRate).toFixed(2)}%
+                            </p>
                           </div>
                         </div>
-                        <div className="mt-6 bg-white bg-opacity-10 rounded-lg p-4 inline-block">
-                          <p className="text-sm">
-                            <strong>Note:</strong> Due to API limitations and CORS restrictions, we're working on the backend implementation.
-                            The educational content above teaches you the methodology!
-                          </p>
+
+                        {/* Stock List */}
+                        <div className="bg-white rounded-xl p-6 border-2 border-blue-300 shadow-md">
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="text-xl font-bold text-blue-900 flex items-center gap-2">
+                              <Briefcase className="w-5 h-5" />
+                              Stocks to Analyze
+                            </h4>
+                            <button
+                              onClick={() => {
+                                const newId = Math.max(...smlStocks.map(s => s.id), 0) + 1;
+                                setSmlStocks([...smlStocks, {
+                                  id: newId,
+                                  name: `Stock ${newId}`,
+                                  beta: 1.0,
+                                  expectedReturn: 10.0
+                                }]);
+                              }}
+                              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                            >
+                              <DollarSign className="w-4 h-4" />
+                              Add Stock
+                            </button>
+                          </div>
+
+                          <div className="space-y-3">
+                            {smlStocks.map((stock) => (
+                              <div key={stock.id} className="grid md:grid-cols-4 gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-600 mb-1">Stock Name</label>
+                                  <input
+                                    type="text"
+                                    value={stock.name}
+                                    onChange={(e) => {
+                                      setSmlStocks(smlStocks.map(s =>
+                                        s.id === stock.id ? {...s, name: e.target.value} : s
+                                      ));
+                                    }}
+                                    className="w-full p-2 border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-600 mb-1">Beta (β)</label>
+                                  <input
+                                    type="number"
+                                    value={stock.beta}
+                                    onChange={(e) => {
+                                      setSmlStocks(smlStocks.map(s =>
+                                        s.id === stock.id ? {...s, beta: parseFloat(e.target.value) || 0} : s
+                                      ));
+                                    }}
+                                    className="w-full p-2 border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
+                                    step="0.1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-600 mb-1">Expected Return (%)</label>
+                                  <input
+                                    type="number"
+                                    value={stock.expectedReturn}
+                                    onChange={(e) => {
+                                      setSmlStocks(smlStocks.map(s =>
+                                        s.id === stock.id ? {...s, expectedReturn: parseFloat(e.target.value) || 0} : s
+                                      ));
+                                    }}
+                                    className="w-full p-2 border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
+                                    step="0.1"
+                                  />
+                                </div>
+                                <div className="flex items-end">
+                                  <button
+                                    onClick={() => {
+                                      setSmlStocks(smlStocks.filter(s => s.id !== stock.id));
+                                    }}
+                                    className="w-full p-2 bg-red-500 text-white rounded hover:bg-red-600 flex items-center justify-center gap-1"
+                                  >
+                                    <XCircle className="w-4 h-4" />
+                                    Remove
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* SML Visualization */}
+                        <div className="bg-white rounded-xl p-6 border-2 border-indigo-300 shadow-md">
+                          <h4 className="text-xl font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                            <LineChartIcon className="w-5 h-5" />
+                            Security Market Line Visualization
+                          </h4>
+
+                          {(() => {
+                            const { riskFreeRate, marketReturn } = smlParams;
+                            const marketRiskPremium = marketReturn - riskFreeRate;
+
+                            // Calculate required returns using CAPM
+                            const stocksWithAnalysis = smlStocks.map(stock => {
+                              const requiredReturn = riskFreeRate + (stock.beta * marketRiskPremium);
+                              const alpha = stock.expectedReturn - requiredReturn;
+                              const status = alpha > 0.5 ? 'undervalued' : alpha < -0.5 ? 'overvalued' : 'fair';
+                              return { ...stock, requiredReturn, alpha, status };
+                            });
+
+                            // Chart dimensions
+                            const width = 800;
+                            const height = 500;
+                            const padding = { top: 40, right: 60, bottom: 60, left: 60 };
+                            const chartWidth = width - padding.left - padding.right;
+                            const chartHeight = height - padding.top - padding.bottom;
+
+                            // Determine axis ranges
+                            const maxBeta = Math.max(2.0, ...stocksWithAnalysis.map(s => s.beta)) + 0.2;
+                            const minReturn = Math.min(riskFreeRate - 2, ...stocksWithAnalysis.map(s => Math.min(s.expectedReturn, s.requiredReturn))) - 2;
+                            const maxReturn = Math.max(marketReturn + 5, ...stocksWithAnalysis.map(s => Math.max(s.expectedReturn, s.requiredReturn))) + 2;
+
+                            // Scale functions
+                            const xScale = (beta) => padding.left + (beta / maxBeta) * chartWidth;
+                            const yScale = (returnVal) => padding.top + chartHeight - ((returnVal - minReturn) / (maxReturn - minReturn)) * chartHeight;
+
+                            // SML line points
+                            const smlStart = { x: xScale(0), y: yScale(riskFreeRate) };
+                            const smlEnd = { x: xScale(maxBeta), y: yScale(riskFreeRate + maxBeta * marketRiskPremium) };
+
+                            return (
+                              <div className="space-y-4">
+                                <svg viewBox={`0 0 ${width} ${height}`} className="w-full border-2 border-gray-200 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50">
+                                  {/* Grid lines */}
+                                  {[0, 0.5, 1.0, 1.5, 2.0].map(beta => (
+                                    <line
+                                      key={`grid-x-${beta}`}
+                                      x1={xScale(beta)}
+                                      y1={padding.top}
+                                      x2={xScale(beta)}
+                                      y2={height - padding.bottom}
+                                      stroke="#e5e7eb"
+                                      strokeWidth="1"
+                                    />
+                                  ))}
+                                  {Array.from({length: 8}, (_, i) => minReturn + i * ((maxReturn - minReturn) / 7)).map((ret, i) => (
+                                    <line
+                                      key={`grid-y-${i}`}
+                                      x1={padding.left}
+                                      y1={yScale(ret)}
+                                      x2={width - padding.right}
+                                      y2={yScale(ret)}
+                                      stroke="#e5e7eb"
+                                      strokeWidth="1"
+                                    />
+                                  ))}
+
+                                  {/* SML Line */}
+                                  <line
+                                    x1={smlStart.x}
+                                    y1={smlStart.y}
+                                    x2={smlEnd.x}
+                                    y2={smlEnd.y}
+                                    stroke="#4f46e5"
+                                    strokeWidth="3"
+                                  />
+                                  <text
+                                    x={smlEnd.x - 100}
+                                    y={smlEnd.y - 10}
+                                    fill="#4f46e5"
+                                    fontSize="14"
+                                    fontWeight="bold"
+                                  >
+                                    Security Market Line
+                                  </text>
+
+                                  {/* Market Point */}
+                                  <circle
+                                    cx={xScale(1.0)}
+                                    cy={yScale(marketReturn)}
+                                    r="6"
+                                    fill="#6366f1"
+                                    stroke="white"
+                                    strokeWidth="2"
+                                  />
+                                  <text
+                                    x={xScale(1.0) + 10}
+                                    y={yScale(marketReturn) - 10}
+                                    fill="#4f46e5"
+                                    fontSize="12"
+                                    fontWeight="bold"
+                                  >
+                                    Market
+                                  </text>
+
+                                  {/* Risk-Free Point */}
+                                  <circle
+                                    cx={xScale(0)}
+                                    cy={yScale(riskFreeRate)}
+                                    r="6"
+                                    fill="#10b981"
+                                    stroke="white"
+                                    strokeWidth="2"
+                                  />
+                                  <text
+                                    x={xScale(0) + 10}
+                                    y={yScale(riskFreeRate) + 5}
+                                    fill="#059669"
+                                    fontSize="12"
+                                    fontWeight="bold"
+                                  >
+                                    Risk-Free
+                                  </text>
+
+                                  {/* Stock points */}
+                                  {stocksWithAnalysis.map((stock, idx) => {
+                                    const color = stock.status === 'undervalued' ? '#10b981' :
+                                                  stock.status === 'overvalued' ? '#ef4444' : '#f59e0b';
+                                    const x = xScale(stock.beta);
+                                    const y = yScale(stock.expectedReturn);
+
+                                    return (
+                                      <g key={stock.id}>
+                                        {/* Line to SML */}
+                                        <line
+                                          x1={x}
+                                          y1={y}
+                                          x2={x}
+                                          y2={yScale(stock.requiredReturn)}
+                                          stroke={color}
+                                          strokeWidth="2"
+                                          strokeDasharray="4"
+                                        />
+                                        {/* Stock point */}
+                                        <circle
+                                          cx={x}
+                                          cy={y}
+                                          r="8"
+                                          fill={color}
+                                          stroke="white"
+                                          strokeWidth="2"
+                                        />
+                                        {/* Label */}
+                                        <text
+                                          x={x + 12}
+                                          y={y + 4}
+                                          fill={color}
+                                          fontSize="11"
+                                          fontWeight="bold"
+                                        >
+                                          {stock.name.split(' ')[0]}
+                                        </text>
+                                      </g>
+                                    );
+                                  })}
+
+                                  {/* X-axis */}
+                                  <line
+                                    x1={padding.left}
+                                    y1={height - padding.bottom}
+                                    x2={width - padding.right}
+                                    y2={height - padding.bottom}
+                                    stroke="#374151"
+                                    strokeWidth="2"
+                                  />
+                                  <text
+                                    x={width / 2}
+                                    y={height - 10}
+                                    textAnchor="middle"
+                                    fill="#374151"
+                                    fontSize="14"
+                                    fontWeight="bold"
+                                  >
+                                    Beta (β)
+                                  </text>
+                                  {[0, 0.5, 1.0, 1.5, 2.0].map(beta => (
+                                    <text
+                                      key={`x-label-${beta}`}
+                                      x={xScale(beta)}
+                                      y={height - padding.bottom + 20}
+                                      textAnchor="middle"
+                                      fill="#6b7280"
+                                      fontSize="12"
+                                    >
+                                      {beta.toFixed(1)}
+                                    </text>
+                                  ))}
+
+                                  {/* Y-axis */}
+                                  <line
+                                    x1={padding.left}
+                                    y1={padding.top}
+                                    x2={padding.left}
+                                    y2={height - padding.bottom}
+                                    stroke="#374151"
+                                    strokeWidth="2"
+                                  />
+                                  <text
+                                    x={-height / 2}
+                                    y={20}
+                                    textAnchor="middle"
+                                    fill="#374151"
+                                    fontSize="14"
+                                    fontWeight="bold"
+                                    transform={`rotate(-90)`}
+                                  >
+                                    Expected Return (%)
+                                  </text>
+                                  {Array.from({length: 8}, (_, i) => minReturn + i * ((maxReturn - minReturn) / 7)).map((ret, i) => (
+                                    <text
+                                      key={`y-label-${i}`}
+                                      x={padding.left - 10}
+                                      y={yScale(ret) + 4}
+                                      textAnchor="end"
+                                      fill="#6b7280"
+                                      fontSize="12"
+                                    >
+                                      {ret.toFixed(1)}
+                                    </text>
+                                  ))}
+                                </svg>
+
+                                {/* Legend */}
+                                <div className="grid md:grid-cols-3 gap-3">
+                                  <div className="flex items-center gap-2 p-2 bg-green-50 rounded border border-green-200">
+                                    <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                                    <span className="text-sm font-medium text-green-900">Undervalued (Above SML)</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 p-2 bg-yellow-50 rounded border border-yellow-200">
+                                    <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
+                                    <span className="text-sm font-medium text-yellow-900">Fairly Valued (On SML)</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 p-2 bg-red-50 rounded border border-red-200">
+                                    <div className="w-4 h-4 rounded-full bg-red-500"></div>
+                                    <span className="text-sm font-medium text-red-900">Overvalued (Below SML)</span>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })()}
+                        </div>
+
+                        {/* Stock Analysis Table */}
+                        <div className="bg-white rounded-xl p-6 border-2 border-purple-300 shadow-md">
+                          <h4 className="text-xl font-bold text-purple-900 mb-4 flex items-center gap-2">
+                            <Calculator className="w-5 h-5" />
+                            Detailed Stock Analysis
+                          </h4>
+
+                          {(() => {
+                            const { riskFreeRate, marketReturn } = smlParams;
+                            const marketRiskPremium = marketReturn - riskFreeRate;
+
+                            const stocksWithAnalysis = smlStocks.map(stock => {
+                              const requiredReturn = riskFreeRate + (stock.beta * marketRiskPremium);
+                              const alpha = stock.expectedReturn - requiredReturn;
+                              const status = alpha > 0.5 ? 'undervalued' : alpha < -0.5 ? 'overvalued' : 'fair';
+                              return { ...stock, requiredReturn, alpha, status };
+                            });
+
+                            return (
+                              <div className="overflow-x-auto">
+                                <table className="w-full">
+                                  <thead>
+                                    <tr className="bg-purple-100 border-b-2 border-purple-300">
+                                      <th className="p-3 text-left text-sm font-bold text-purple-900">Stock</th>
+                                      <th className="p-3 text-center text-sm font-bold text-purple-900">Beta (β)</th>
+                                      <th className="p-3 text-center text-sm font-bold text-purple-900">Expected Return</th>
+                                      <th className="p-3 text-center text-sm font-bold text-purple-900">Required Return<br/>(CAPM)</th>
+                                      <th className="p-3 text-center text-sm font-bold text-purple-900">Alpha (α)</th>
+                                      <th className="p-3 text-center text-sm font-bold text-purple-900">Valuation</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {stocksWithAnalysis.map((stock, idx) => {
+                                      const bgColor = idx % 2 === 0 ? 'bg-white' : 'bg-purple-50';
+                                      const statusColor = stock.status === 'undervalued' ? 'text-green-700 bg-green-100' :
+                                                         stock.status === 'overvalued' ? 'text-red-700 bg-red-100' :
+                                                         'text-yellow-700 bg-yellow-100';
+                                      const statusIcon = stock.status === 'undervalued' ? <TrendingUp className="w-4 h-4" /> :
+                                                        stock.status === 'overvalued' ? <TrendingDown className="w-4 h-4" /> :
+                                                        <Activity className="w-4 h-4" />;
+                                      const statusText = stock.status === 'undervalued' ? 'Undervalued - BUY' :
+                                                        stock.status === 'overvalued' ? 'Overvalued - SELL' :
+                                                        'Fairly Valued - HOLD';
+
+                                      return (
+                                        <tr key={stock.id} className={`${bgColor} border-b border-purple-200`}>
+                                          <td className="p-3 font-medium text-gray-900">{stock.name}</td>
+                                          <td className="p-3 text-center">{stock.beta.toFixed(2)}</td>
+                                          <td className="p-3 text-center font-semibold text-blue-700">{stock.expectedReturn.toFixed(2)}%</td>
+                                          <td className="p-3 text-center font-semibold text-purple-700">{stock.requiredReturn.toFixed(2)}%</td>
+                                          <td className="p-3 text-center">
+                                            <span className={`inline-block px-2 py-1 rounded font-bold ${
+                                              stock.alpha > 0 ? 'text-green-700 bg-green-100' :
+                                              stock.alpha < 0 ? 'text-red-700 bg-red-100' :
+                                              'text-gray-700 bg-gray-100'
+                                            }`}>
+                                              {stock.alpha > 0 ? '+' : ''}{stock.alpha.toFixed(2)}%
+                                            </span>
+                                          </td>
+                                          <td className="p-3">
+                                            <div className={`flex items-center justify-center gap-2 px-3 py-1 rounded-lg font-bold ${statusColor}`}>
+                                              {statusIcon}
+                                              {statusText}
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
+                                  </tbody>
+                                </table>
+
+                                {/* Summary Statistics */}
+                                <div className="mt-4 grid md:grid-cols-3 gap-3">
+                                  <div className="p-3 bg-green-50 rounded-lg border-2 border-green-200">
+                                    <p className="text-xs text-green-700 font-medium">Undervalued Stocks</p>
+                                    <p className="text-2xl font-bold text-green-900">
+                                      {stocksWithAnalysis.filter(s => s.status === 'undervalued').length}
+                                    </p>
+                                  </div>
+                                  <div className="p-3 bg-yellow-50 rounded-lg border-2 border-yellow-200">
+                                    <p className="text-xs text-yellow-700 font-medium">Fairly Valued Stocks</p>
+                                    <p className="text-2xl font-bold text-yellow-900">
+                                      {stocksWithAnalysis.filter(s => s.status === 'fair').length}
+                                    </p>
+                                  </div>
+                                  <div className="p-3 bg-red-50 rounded-lg border-2 border-red-200">
+                                    <p className="text-xs text-red-700 font-medium">Overvalued Stocks</p>
+                                    <p className="text-2xl font-bold text-red-900">
+                                      {stocksWithAnalysis.filter(s => s.status === 'overvalued').length}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })()}
+                        </div>
+
+                        {/* Educational Note */}
+                        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-4 border-2 border-indigo-300">
+                          <div className="flex items-start gap-3">
+                            <Info className="w-6 h-6 text-indigo-700 flex-shrink-0 mt-1" />
+                            <div className="text-sm">
+                              <strong className="text-indigo-900">Understanding the Analysis:</strong>
+                              <p className="text-gray-700 mt-1">
+                                The SML shows the required return for any level of systematic risk (beta). Stocks <strong>above the line</strong> offer higher returns than required by CAPM and are potentially <strong>undervalued</strong>. Stocks <strong>below the line</strong> offer lower returns than required and are potentially <strong>overvalued</strong>. Alpha (α) measures this excess return.
+                              </p>
+                              <div className="mt-2 p-2 bg-white rounded">
+                                <DisplayEquation>
+                                  {`\\alpha = E[R_i] - [R_f + \\beta_i(E[R_M] - R_f)]`}
+                                </DisplayEquation>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
