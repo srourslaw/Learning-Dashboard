@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import {
   ArrowLeft,
   TrendingUp,
@@ -26,7 +27,10 @@ import {
   DollarSign,
   AlertTriangle,
   XCircle,
-  Cpu
+  Cpu,
+  Download,
+  RefreshCw,
+  Search
 } from 'lucide-react';
 import { DisplayEquation } from '../components/MathEquation';
 
@@ -1731,6 +1735,131 @@ export default function PortfolioTheory() {
                             <h4 className="font-bold text-red-900">Below SML</h4>
                           </div>
                           <p className="text-sm text-gray-700"><strong className="text-red-700">Overvalued!</strong> Asset offers lower return than CAPM predicts for its risk level. <strong>Sell opportunity.</strong></p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Interactive SML Analyzer - NEW SECTION */}
+                    <div className="bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 rounded-2xl p-8 border-4 border-cyan-400 shadow-2xl">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl shadow-lg">
+                          <LineChartIcon className="w-8 h-8 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-3xl font-bold text-cyan-900">Interactive SML Analyzer</h3>
+                          <p className="text-gray-600">Analyze Real Stocks Using Yahoo Finance Data</p>
+                        </div>
+                      </div>
+
+                      {/* Educational Content: How to Calculate Beta */}
+                      <div className="bg-white rounded-xl p-6 border-2 border-blue-300 shadow-md mb-6">
+                        <h4 className="text-2xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+                          <GraduationCap className="w-6 h-6" />
+                          How to Calculate Beta from Historical Data
+                        </h4>
+
+                        <div className="space-y-4">
+                          <div className="bg-blue-50 rounded-lg p-5 border-2 border-blue-200">
+                            <h5 className="font-bold text-blue-900 mb-3">The Beta Formula:</h5>
+                            <DisplayEquation>
+                              {`\\beta_i = \\frac{\\text{Cov}(R_i, R_M)}{\\text{Var}(R_M)} = \\frac{\\rho_{i,M} \\cdot \\sigma_i \\cdot \\sigma_M}{\\sigma_M^2}`}
+                            </DisplayEquation>
+                            <div className="mt-4 grid md:grid-cols-3 gap-2 text-sm">
+                              <div className="bg-white rounded p-2">
+                                <DisplayEquation>{`\\text{Cov}(R_i, R_M)`}</DisplayEquation> = Covariance between stock and market
+                              </div>
+                              <div className="bg-white rounded p-2">
+                                <DisplayEquation>{`\\text{Var}(R_M)`}</DisplayEquation> = Variance of market returns
+                              </div>
+                              <div className="bg-white rounded p-2">
+                                <DisplayEquation>{`\\rho_{i,M}`}</DisplayEquation> = Correlation coefficient
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-5 border-2 border-indigo-300">
+                            <h5 className="font-bold text-indigo-900 mb-3">📊 Step-by-Step Calculation:</h5>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex items-start gap-3">
+                                <div className="flex-shrink-0 w-8 h-8 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold">1</div>
+                                <div>
+                                  <strong className="text-gray-800">Collect Historical Prices</strong>
+                                  <p className="text-gray-700">Get closing prices for the stock and market index (e.g., S&P 500) over a period (typically 1-5 years)</p>
+                                </div>
+                              </div>
+                              <div className="flex items-start gap-3">
+                                <div className="flex-shrink-0 w-8 h-8 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold">2</div>
+                                <div>
+                                  <strong className="text-gray-800">Calculate Returns</strong>
+                                  <p className="text-gray-700">Convert prices to periodic returns: <DisplayEquation>{`R_t = \\frac{P_t - P_{t-1}}{P_{t-1}}`}</DisplayEquation></p>
+                                </div>
+                              </div>
+                              <div className="flex items-start gap-3">
+                                <div className="flex-shrink-0 w-8 h-8 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold">3</div>
+                                <div>
+                                  <strong className="text-gray-800">Calculate Covariance</strong>
+                                  <p className="text-gray-700">Find how stock returns move with market returns</p>
+                                </div>
+                              </div>
+                              <div className="flex items-start gap-3">
+                                <div className="flex-shrink-0 w-8 h-8 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold">4</div>
+                                <div>
+                                  <strong className="text-gray-800">Calculate Market Variance</strong>
+                                  <p className="text-gray-700">Find the variance of market returns</p>
+                                </div>
+                              </div>
+                              <div className="flex items-start gap-3">
+                                <div className="flex-shrink-0 w-8 h-8 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold">5</div>
+                                <div>
+                                  <strong className="text-gray-800">Compute Beta</strong>
+                                  <p className="text-gray-700">Divide covariance by market variance to get beta</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-4 border-2 border-yellow-300">
+                            <div className="flex items-start gap-3">
+                              <Info className="w-6 h-6 text-yellow-700 flex-shrink-0 mt-1" />
+                              <div className="text-sm">
+                                <strong className="text-yellow-900">Pro Tip:</strong>
+                                <p className="text-gray-700">Beta can also be calculated using linear regression: regress stock returns (y) against market returns (x). The slope coefficient is beta!</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Coming Soon Badge */}
+                      <div className="bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl p-8 text-white text-center shadow-lg">
+                        <Cpu className="w-16 h-16 mx-auto mb-4 animate-pulse" />
+                        <h4 className="text-2xl font-bold mb-3">🚀 Interactive SML Tool Coming Soon!</h4>
+                        <p className="text-lg mb-4">
+                          We're building a powerful tool that will let you:
+                        </p>
+                        <div className="grid md:grid-cols-2 gap-3 text-left max-w-3xl mx-auto">
+                          <div className="bg-white bg-opacity-20 rounded-lg p-3">
+                            <strong>✓ Fetch Real Yahoo Finance Data</strong>
+                            <p className="text-sm">Get live historical prices for any stock</p>
+                          </div>
+                          <div className="bg-white bg-opacity-20 rounded-lg p-3">
+                            <strong>✓ Auto-Calculate Beta</strong>
+                            <p className="text-sm">See beta calculated from real market data</p>
+                          </div>
+                          <div className="bg-white bg-opacity-20 rounded-lg p-3">
+                            <strong>✓ Visualize the SML</strong>
+                            <p className="text-sm">Plot stocks on the Security Market Line</p>
+                          </div>
+                          <div className="bg-white bg-opacity-20 rounded-lg p-3">
+                            <strong>✓ Identify Opportunities</strong>
+                            <p className="text-sm">See which stocks are undervalued or overvalued</p>
+                          </div>
+                        </div>
+                        <div className="mt-6 bg-white bg-opacity-10 rounded-lg p-4 inline-block">
+                          <p className="text-sm">
+                            <strong>Note:</strong> Due to API limitations and CORS restrictions, we're working on the backend implementation.
+                            The educational content above teaches you the methodology!
+                          </p>
                         </div>
                       </div>
                     </div>
