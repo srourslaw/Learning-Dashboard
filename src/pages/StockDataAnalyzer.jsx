@@ -18,7 +18,9 @@ import {
   AlertCircle,
   CheckCircle2,
   Loader,
-  Info
+  Info,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -50,6 +52,7 @@ export default function StockDataAnalyzer() {
   const navigate = useNavigate();
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview'); // overview, prices, income, balance, cashflow
   const [dateRange, setDateRange] = useState('1y'); // 1m, 3m, 6m, 1y, 3y, 5y
   const [loading, setLoading] = useState(false);
@@ -305,51 +308,117 @@ export default function StockDataAnalyzer() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Company Search/Selection */}
-        <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-indigo-200 mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <Search className="w-6 h-6 text-indigo-600" />
-            <h2 className="text-2xl font-bold text-gray-900">Select Australian Company</h2>
-          </div>
-
-          <div className="mb-6">
-            <input
-              type="text"
-              placeholder="Search by company name, symbol, or sector..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-4 border-2 border-indigo-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg"
-            />
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-3 max-h-96 overflow-y-auto">
-            {filteredCompanies.map((company) => (
-              <button
-                key={company.symbol}
-                onClick={() => handleCompanySelect(company)}
-                className={`p-4 rounded-lg border-2 transition-all text-left ${
-                  selectedCompany?.symbol === company.symbol
-                    ? 'border-indigo-600 bg-indigo-50 shadow-md'
-                    : 'border-gray-200 hover:border-indigo-300 hover:bg-indigo-50'
-                }`}
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <Building2 className="w-5 h-5 text-indigo-600" />
-                  {selectedCompany?.symbol === company.symbol && (
-                    <CheckCircle2 className="w-5 h-5 text-indigo-600" />
+        {/* Company Search/Selection - Compact Dropdown */}
+        <div className="relative mb-8">
+          {/* Dropdown Trigger Button */}
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-2xl p-6 shadow-xl border-2 border-indigo-300 transition-all duration-300 hover:shadow-2xl"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-white/20 backdrop-blur rounded-xl">
+                  <Building2 className="w-6 h-6 text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-medium text-indigo-100 mb-1">Selected Company</p>
+                  {selectedCompany ? (
+                    <div>
+                      <p className="text-2xl font-bold text-white">{selectedCompany.name}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-indigo-100 font-semibold">{selectedCompany.symbol.replace('.AX', '')}</span>
+                        <span className="px-2 py-1 bg-white/20 rounded-lg text-xs font-medium text-white">{selectedCompany.sector}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xl font-semibold text-white">Click to select an Australian company</p>
                   )}
                 </div>
-                <div className="font-bold text-gray-900 mb-1">{company.symbol.replace('.AX', '')}</div>
-                <div className="text-sm text-gray-700 font-medium mb-1">{company.name}</div>
-                <div className="text-xs text-gray-500">{company.sector}</div>
-              </button>
-            ))}
-          </div>
+              </div>
+              <div className={`transform transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}>
+                {isDropdownOpen ? (
+                  <ChevronUp className="w-8 h-8 text-white" />
+                ) : (
+                  <ChevronDown className="w-8 h-8 text-white" />
+                )}
+              </div>
+            </div>
+          </button>
 
-          {filteredCompanies.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-              <p>No companies found matching "{searchQuery}"</p>
+          {/* Dropdown Panel */}
+          {isDropdownOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border-2 border-indigo-200 z-50 overflow-hidden animate-in slide-in-from-top-2 duration-300">
+              {/* Search Bar */}
+              <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b-2 border-indigo-200">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-indigo-600" />
+                  <input
+                    type="text"
+                    placeholder="Search by company name, symbol, or sector..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 border-2 border-indigo-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base"
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              {/* Companies List */}
+              <div className="max-h-96 overflow-y-auto">
+                {filteredCompanies.length > 0 ? (
+                  <div className="divide-y divide-indigo-100">
+                    {filteredCompanies.map((company) => (
+                      <button
+                        key={company.symbol}
+                        onClick={() => {
+                          handleCompanySelect(company);
+                          setIsDropdownOpen(false);
+                          setSearchQuery('');
+                        }}
+                        className={`w-full p-4 text-left transition-all duration-200 flex items-center justify-between group ${
+                          selectedCompany?.symbol === company.symbol
+                            ? 'bg-indigo-100 hover:bg-indigo-200'
+                            : 'hover:bg-indigo-50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-4 flex-1">
+                          <div className={`p-2 rounded-lg transition-colors ${
+                            selectedCompany?.symbol === company.symbol
+                              ? 'bg-indigo-200'
+                              : 'bg-indigo-100 group-hover:bg-indigo-200'
+                          }`}>
+                            <Building2 className="w-5 h-5 text-indigo-600" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-1">
+                              <span className="font-bold text-gray-900 text-lg">{company.symbol.replace('.AX', '')}</span>
+                              <span className="px-2 py-1 bg-indigo-100 rounded-md text-xs font-medium text-indigo-700">
+                                {company.sector}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600 font-medium">{company.name}</p>
+                          </div>
+                        </div>
+                        {selectedCompany?.symbol === company.symbol && (
+                          <CheckCircle2 className="w-6 h-6 text-indigo-600 flex-shrink-0" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-gray-500">
+                    <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                    <p className="text-base">No companies found matching "{searchQuery}"</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="p-3 bg-gradient-to-r from-indigo-50 to-purple-50 border-t-2 border-indigo-200">
+                <p className="text-xs text-center text-gray-600">
+                  Showing {filteredCompanies.length} of {AUSTRALIAN_COMPANIES.length} Australian companies
+                </p>
+              </div>
             </div>
           )}
         </div>
