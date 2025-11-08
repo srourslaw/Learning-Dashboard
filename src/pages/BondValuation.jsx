@@ -65,11 +65,34 @@ export default function BondValuation() {
     // Zero Coupon
     zero_faceValue: 1000,
     zero_ytm: 5,
-    zero_years: 8
+    zero_years: 8,
+
+    // Clean & Dirty Price
+    clean_faceValue: 1000,
+    clean_couponRate: 6,
+    clean_ytm: 7,
+    clean_yearsToMaturity: 5,
+    clean_paymentsPerYear: 2,
+    clean_daysSinceLastCoupon: 45,
+    clean_daysInCouponPeriod: 182,
+
+    // Accrued Interest
+    acc_faceValue: 1000,
+    acc_couponRate: 5,
+    acc_paymentsPerYear: 2,
+    acc_daysSinceLastCoupon: 90,
+    acc_daysInCouponPeriod: 182
   });
 
   const [results, setResults] = useState({});
   const [savedCalculations, setSavedCalculations] = useState([]);
+
+  // Bond Comparison State
+  const [bonds, setBonds] = useState([
+    { id: 1, name: 'Bond A', faceValue: 1000, couponRate: 5, ytm: 6, years: 5, paymentsPerYear: 2 },
+    { id: 2, name: 'Bond B', faceValue: 1000, couponRate: 7, ytm: 6, years: 5, paymentsPerYear: 2 }
+  ]);
+  const [nextBondId, setNextBondId] = useState(3);
 
   // Practice Problems State
   const [expandedProblems, setExpandedProblems] = useState({});
@@ -96,7 +119,9 @@ export default function BondValuation() {
     { id: 'ytm', name: 'Yield to Maturity', icon: Percent, color: 'from-blue-500 to-indigo-500' },
     { id: 'duration', name: 'Duration & Convexity', icon: Clock, color: 'from-purple-500 to-pink-500' },
     { id: 'priceChange', name: 'Price Change', icon: TrendingUp, color: 'from-orange-500 to-red-500' },
-    { id: 'zeroCoupon', name: 'Zero-Coupon Bond', icon: Target, color: 'from-teal-500 to-cyan-500' }
+    { id: 'zeroCoupon', name: 'Zero-Coupon Bond', icon: Target, color: 'from-teal-500 to-cyan-500' },
+    { id: 'cleanDirty', name: 'Clean & Dirty Price', icon: Calendar, color: 'from-amber-500 to-yellow-500' },
+    { id: 'accrued', name: 'Accrued Interest', icon: Activity, color: 'from-rose-500 to-pink-500' }
   ];
 
   // Handle input changes
@@ -239,6 +264,102 @@ export default function BondValuation() {
     });
   };
 
+  // Calculate Clean and Dirty Price
+  const calculateCleanDirtyPrice = () => {
+    const {
+      clean_faceValue,
+      clean_couponRate,
+      clean_ytm,
+      clean_yearsToMaturity,
+      clean_paymentsPerYear,
+      clean_daysSinceLastCoupon,
+      clean_daysInCouponPeriod
+    } = inputs;
+
+    // Calculate bond price (full/dirty price)
+    const periodicCoupon = (clean_faceValue * clean_couponRate / 100) / clean_paymentsPerYear;
+    const periodicYield = clean_ytm / 100 / clean_paymentsPerYear;
+    const totalPeriods = clean_yearsToMaturity * clean_paymentsPerYear;
+
+    let bondPrice = 0;
+    for (let t = 1; t <= totalPeriods; t++) {
+      bondPrice += periodicCoupon / Math.pow(1 + periodicYield, t);
+    }
+    bondPrice += clean_faceValue / Math.pow(1 + periodicYield, totalPeriods);
+
+    // Calculate accrued interest
+    const accruedInterest = periodicCoupon * (clean_daysSinceLastCoupon / clean_daysInCouponPeriod);
+
+    // Clean price = Dirty price - Accrued interest
+    const cleanPrice = bondPrice - accruedInterest;
+    const dirtyPrice = bondPrice;
+
+    setResults({
+      ...results,
+      cleanDirty: {
+        cleanPrice,
+        dirtyPrice,
+        accruedInterest,
+        periodicCoupon,
+        daysFraction: clean_daysSinceLastCoupon / clean_daysInCouponPeriod
+      }
+    });
+  };
+
+  // Calculate Accrued Interest
+  const calculateAccruedInterest = () => {
+    const {
+      acc_faceValue,
+      acc_couponRate,
+      acc_paymentsPerYear,
+      acc_daysSinceLastCoupon,
+      acc_daysInCouponPeriod
+    } = inputs;
+
+    const periodicCoupon = (acc_faceValue * acc_couponRate / 100) / acc_paymentsPerYear;
+    const accruedInterest = periodicCoupon * (acc_daysSinceLastCoupon / acc_daysInCouponPeriod);
+    const daysFraction = acc_daysSinceLastCoupon / acc_daysInCouponPeriod;
+    const daysRemaining = acc_daysInCouponPeriod - acc_daysSinceLastCoupon;
+
+    setResults({
+      ...results,
+      accrued: {
+        accruedInterest,
+        periodicCoupon,
+        daysFraction,
+        daysRemaining,
+        percentOfCoupon: (daysFraction * 100)
+      }
+    });
+  };
+
+  // Bond comparison management
+  const addBond = () => {
+    const newBond = {
+      id: nextBondId,
+      name: `Bond ${String.fromCharCode(64 + nextBondId)}`,
+      faceValue: 1000,
+      couponRate: 6,
+      ytm: 6,
+      years: 5,
+      paymentsPerYear: 2
+    };
+    setBonds([...bonds, newBond]);
+    setNextBondId(nextBondId + 1);
+  };
+
+  const removeBond = (id) => {
+    if (bonds.length > 1) {
+      setBonds(bonds.filter(b => b.id !== id));
+    }
+  };
+
+  const updateBond = (id, field, value) => {
+    setBonds(bonds.map(b =>
+      b.id === id ? { ...b, [field]: field === 'name' ? value : parseFloat(value) || 0 } : b
+    ));
+  };
+
   // Generate bond price sensitivity data
   const generatePriceSensitivityData = () => {
     const { faceValue, couponRate, yearsToMaturity, paymentsPerYear } = inputs;
@@ -281,6 +402,99 @@ export default function BondValuation() {
         cashFlow: cashFlow.toFixed(2),
         coupon: periodicCoupon.toFixed(2),
         principal: t === totalPeriods ? faceValue : 0
+      });
+    }
+
+    return data;
+  };
+
+  // Generate accrued interest timeline data
+  const generateAccruedInterestData = () => {
+    const { acc_paymentsPerYear, acc_couponRate, acc_faceValue, acc_daysInCouponPeriod } = inputs;
+    const periodicCoupon = (acc_faceValue * acc_couponRate / 100) / acc_paymentsPerYear;
+    const data = [];
+
+    for (let day = 0; day <= acc_daysInCouponPeriod; day += Math.floor(acc_daysInCouponPeriod / 20)) {
+      const accruedInterest = periodicCoupon * (day / acc_daysInCouponPeriod);
+      data.push({
+        day,
+        accruedInterest: accruedInterest.toFixed(2),
+        percentOfCoupon: ((day / acc_daysInCouponPeriod) * 100).toFixed(1)
+      });
+    }
+
+    return data;
+  };
+
+  // Generate bond comparison data
+  const generateBondComparisonData = () => {
+    return bonds.map(bond => {
+      const periodicCoupon = (bond.faceValue * bond.couponRate / 100) / bond.paymentsPerYear;
+      const periodicYield = bond.ytm / 100 / bond.paymentsPerYear;
+      const totalPeriods = bond.years * bond.paymentsPerYear;
+
+      let price = 0;
+      let weightedTime = 0;
+
+      for (let t = 1; t <= totalPeriods; t++) {
+        const pv = periodicCoupon / Math.pow(1 + periodicYield, t);
+        price += pv;
+        weightedTime += (t / bond.paymentsPerYear) * pv;
+      }
+
+      const pvFace = bond.faceValue / Math.pow(1 + periodicYield, totalPeriods);
+      price += pvFace;
+      weightedTime += (totalPeriods / bond.paymentsPerYear) * pvFace;
+
+      const macaulayDuration = weightedTime / price;
+      const modifiedDuration = macaulayDuration / (1 + periodicYield);
+      const currentYield = (bond.couponRate * bond.faceValue / 100) / price;
+
+      return {
+        name: bond.name,
+        price: parseFloat(price.toFixed(2)),
+        duration: parseFloat(macaulayDuration.toFixed(2)),
+        modifiedDuration: parseFloat(modifiedDuration.toFixed(2)),
+        currentYield: parseFloat((currentYield * 100).toFixed(2)),
+        ytm: bond.ytm,
+        couponRate: bond.couponRate
+      };
+    });
+  };
+
+  // Generate clean vs dirty price over coupon period
+  const generateCleanDirtyComparison = () => {
+    const {
+      clean_faceValue,
+      clean_couponRate,
+      clean_ytm,
+      clean_yearsToMaturity,
+      clean_paymentsPerYear,
+      clean_daysInCouponPeriod
+    } = inputs;
+
+    const periodicCoupon = (clean_faceValue * clean_couponRate / 100) / clean_paymentsPerYear;
+    const periodicYield = clean_ytm / 100 / clean_paymentsPerYear;
+    const totalPeriods = clean_yearsToMaturity * clean_paymentsPerYear;
+
+    // Calculate base bond price (dirty price at coupon payment date)
+    let baseBondPrice = 0;
+    for (let t = 1; t <= totalPeriods; t++) {
+      baseBondPrice += periodicCoupon / Math.pow(1 + periodicYield, t);
+    }
+    baseBondPrice += clean_faceValue / Math.pow(1 + periodicYield, totalPeriods);
+
+    const data = [];
+    for (let day = 0; day <= clean_daysInCouponPeriod; day += Math.floor(clean_daysInCouponPeriod / 20)) {
+      const accruedInterest = periodicCoupon * (day / clean_daysInCouponPeriod);
+      const dirtyPrice = baseBondPrice + accruedInterest;
+      const cleanPrice = dirtyPrice - accruedInterest;
+
+      data.push({
+        day,
+        cleanPrice: parseFloat(cleanPrice.toFixed(2)),
+        dirtyPrice: parseFloat(dirtyPrice.toFixed(2)),
+        accruedInterest: parseFloat(accruedInterest.toFixed(2))
       });
     }
 
@@ -403,6 +617,43 @@ export default function BondValuation() {
         ],
         answer: '-6.875%',
         explanation: 'Including convexity provides a more accurate estimate. The convexity adjustment (+0.325%) partially offsets the duration-based decline, showing bonds have positive convexity that benefits investors when yields change.'
+      }
+    },
+    {
+      id: 7,
+      title: 'Clean vs Dirty Price',
+      difficulty: 'intermediate',
+      category: 'Bond Pricing',
+      type: 'Calculation',
+      problem: 'A bond with $1,000 face value and 6% semi-annual coupon is quoted at a clean price of $980. It has been 45 days since the last coupon payment. The coupon period is 182 days. What is the dirty price (invoice price)?',
+      hint: 'Dirty Price = Clean Price + Accrued Interest. Calculate accrued interest based on days elapsed.',
+      solution: {
+        steps: [
+          { step: 1, description: 'Identify given information', detail: 'Bond and timing details', latex: '\\begin{aligned} \\text{Clean Price} &= \\$980 \\\\ \\text{Face Value} &= \\$1{,}000 \\\\ \\text{Coupon Rate} &= 6\\% \\\\ \\text{Days Elapsed} &= 45 \\\\ \\text{Days in Period} &= 182 \\end{aligned}' },
+          { step: 2, description: 'Calculate periodic coupon', detail: 'Semi-annual payment amount', latex: '\\text{Periodic Coupon} = \\frac{1{,}000 \\times 0.06}{2} = \\$30' },
+          { step: 3, description: 'Calculate accrued interest', detail: 'Pro-rated interest earned', latex: '\\text{AI} = 30 \\times \\frac{45}{182} = 30 \\times 0.2473 = \\$7.42' },
+          { step: 4, description: 'Calculate dirty price', detail: 'Invoice price', latex: '\\text{Dirty Price} = 980 + 7.42 = \\$987.42' }
+        ],
+        answer: '$987.42',
+        explanation: 'The buyer pays the dirty price of $987.42, which includes the $7.42 accrued interest owed to the seller. On the next coupon date, the buyer receives the full $30 coupon.'
+      }
+    },
+    {
+      id: 8,
+      title: 'Accrued Interest Calculation',
+      difficulty: 'beginner',
+      category: 'Accrued Interest',
+      type: 'Calculation',
+      problem: 'A corporate bond pays an annual coupon of $80. You purchase it 120 days after the last coupon payment. Assuming a 365-day year, how much accrued interest do you owe the seller?',
+      hint: 'Accrued Interest = Annual Coupon × (Days Elapsed / Days in Year)',
+      solution: {
+        steps: [
+          { step: 1, description: 'Given information', detail: 'Coupon and timing', latex: '\\begin{aligned} \\text{Annual Coupon} &= \\$80 \\\\ \\text{Days Elapsed} &= 120 \\\\ \\text{Days in Year} &= 365 \\end{aligned}' },
+          { step: 2, description: 'Accrued interest formula', detail: 'Pro-rated coupon payment', latex: '\\text{AI} = \\text{Coupon} \\times \\frac{\\text{Days Elapsed}}{\\text{Days in Period}}' },
+          { step: 3, description: 'Calculate accrued interest', detail: 'Amount owed to seller', latex: '\\text{AI} = 80 \\times \\frac{120}{365} = 80 \\times 0.3288 = \\$26.30' }
+        ],
+        answer: '$26.30',
+        explanation: 'You must pay the seller $26.30 in accrued interest because they held the bond for 120 days of the coupon period and earned that portion of the interest.'
       }
     }
   ];
@@ -1249,6 +1500,264 @@ export default function BondValuation() {
                 )}
               </div>
             )}
+
+            {/* CLEAN & DIRTY PRICE CALCULATOR */}
+            {activeCalculator === 'cleanDirty' && (
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-xl">
+                    <Calendar className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-800">Clean & Dirty Price Calculator</h3>
+                    <p className="text-gray-600">Understand the difference between clean and dirty bond prices</p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Face Value ($)</label>
+                    <input
+                      type="number"
+                      value={inputs.clean_faceValue}
+                      onChange={(e) => handleInputChange('clean_faceValue', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Coupon Rate (%)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={inputs.clean_couponRate}
+                      onChange={(e) => handleInputChange('clean_couponRate', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Yield to Maturity (%)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={inputs.clean_ytm}
+                      onChange={(e) => handleInputChange('clean_ytm', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Years to Maturity</label>
+                    <input
+                      type="number"
+                      value={inputs.clean_yearsToMaturity}
+                      onChange={(e) => handleInputChange('clean_yearsToMaturity', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Payments Per Year</label>
+                    <select
+                      value={inputs.clean_paymentsPerYear}
+                      onChange={(e) => handleInputChange('clean_paymentsPerYear', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none"
+                    >
+                      <option value="1">Annual</option>
+                      <option value="2">Semi-Annual</option>
+                      <option value="4">Quarterly</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Days Since Last Coupon</label>
+                    <input
+                      type="number"
+                      value={inputs.clean_daysSinceLastCoupon}
+                      onChange={(e) => handleInputChange('clean_daysSinceLastCoupon', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Days in Coupon Period</label>
+                    <input
+                      type="number"
+                      value={inputs.clean_daysInCouponPeriod}
+                      onChange={(e) => handleInputChange('clean_daysInCouponPeriod', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Typically 182 days for semi-annual, 365 for annual, 91 for quarterly</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={calculateCleanDirtyPrice}
+                  className="w-full bg-gradient-to-r from-amber-600 to-yellow-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                >
+                  <Calculator className="w-6 h-6" />
+                  Calculate Clean & Dirty Price
+                </button>
+
+                {results.cleanDirty && (
+                  <div className="mt-6 space-y-4 animate-fadeIn">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl p-6 text-white">
+                        <h4 className="text-lg font-semibold mb-2">Clean Price</h4>
+                        <p className="text-4xl font-bold">${results.cleanDirty.cleanPrice.toFixed(2)}</p>
+                        <p className="text-green-100 mt-2">Quoted price (excludes accrued interest)</p>
+                      </div>
+                      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl p-6 text-white">
+                        <h4 className="text-lg font-semibold mb-2">Dirty Price</h4>
+                        <p className="text-4xl font-bold">${results.cleanDirty.dirtyPrice.toFixed(2)}</p>
+                        <p className="text-blue-100 mt-2">Invoice price (includes accrued interest)</p>
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div className="bg-amber-50 rounded-xl p-4 border-2 border-amber-200">
+                        <p className="text-sm font-semibold text-amber-900 mb-1">Accrued Interest</p>
+                        <p className="text-2xl font-bold text-amber-700">${results.cleanDirty.accruedInterest.toFixed(2)}</p>
+                      </div>
+                      <div className="bg-purple-50 rounded-xl p-4 border-2 border-purple-200">
+                        <p className="text-sm font-semibold text-purple-900 mb-1">Periodic Coupon</p>
+                        <p className="text-2xl font-bold text-purple-700">${results.cleanDirty.periodicCoupon.toFixed(2)}</p>
+                      </div>
+                      <div className="bg-pink-50 rounded-xl p-4 border-2 border-pink-200">
+                        <p className="text-sm font-semibold text-pink-900 mb-1">Days Fraction</p>
+                        <p className="text-2xl font-bold text-pink-700">{(results.cleanDirty.daysFraction * 100).toFixed(1)}%</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-amber-50 rounded-xl p-4 border-l-4 border-amber-500">
+                      <div className="flex items-start gap-3">
+                        <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-semibold text-amber-900 mb-1">Key Concept:</p>
+                          <p className="text-sm text-amber-800">
+                            <strong>Clean Price</strong> is the quoted price (what you see in newspapers). <strong>Dirty Price</strong> is what you actually pay - it includes accrued interest since the last coupon payment.
+                            Formula: Dirty Price = Clean Price + Accrued Interest
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ACCRUED INTEREST CALCULATOR */}
+            {activeCalculator === 'accrued' && (
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 bg-gradient-to-r from-rose-500 to-pink-500 rounded-xl">
+                    <Activity className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-800">Accrued Interest Calculator</h3>
+                    <p className="text-gray-600">Calculate interest accumulated since last coupon payment</p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Face Value ($)</label>
+                    <input
+                      type="number"
+                      value={inputs.acc_faceValue}
+                      onChange={(e) => handleInputChange('acc_faceValue', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-rose-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Annual Coupon Rate (%)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={inputs.acc_couponRate}
+                      onChange={(e) => handleInputChange('acc_couponRate', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-rose-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Payments Per Year</label>
+                    <select
+                      value={inputs.acc_paymentsPerYear}
+                      onChange={(e) => handleInputChange('acc_paymentsPerYear', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-rose-500 focus:outline-none"
+                    >
+                      <option value="1">Annual</option>
+                      <option value="2">Semi-Annual</option>
+                      <option value="4">Quarterly</option>
+                      <option value="12">Monthly</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Days Since Last Coupon</label>
+                    <input
+                      type="number"
+                      value={inputs.acc_daysSinceLastCoupon}
+                      onChange={(e) => handleInputChange('acc_daysSinceLastCoupon', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-rose-500 focus:outline-none"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Days in Coupon Period</label>
+                    <input
+                      type="number"
+                      value={inputs.acc_daysInCouponPeriod}
+                      onChange={(e) => handleInputChange('acc_daysInCouponPeriod', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-rose-500 focus:outline-none"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">182 for semi-annual, 365 for annual, 91 for quarterly, 30 for monthly</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={calculateAccruedInterest}
+                  className="w-full bg-gradient-to-r from-rose-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                >
+                  <Calculator className="w-6 h-6" />
+                  Calculate Accrued Interest
+                </button>
+
+                {results.accrued && (
+                  <div className="mt-6 space-y-4 animate-fadeIn">
+                    <div className="bg-gradient-to-r from-rose-500 to-pink-500 rounded-xl p-6 text-white">
+                      <h4 className="text-lg font-semibold mb-2">Accrued Interest</h4>
+                      <p className="text-4xl font-bold">${results.accrued.accruedInterest.toFixed(2)}</p>
+                      <p className="text-rose-100 mt-2">
+                        {results.accrued.percentOfCoupon.toFixed(1)}% of next coupon payment
+                      </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+                        <p className="text-sm font-semibold text-blue-900 mb-1">Periodic Coupon</p>
+                        <p className="text-2xl font-bold text-blue-700">${results.accrued.periodicCoupon.toFixed(2)}</p>
+                      </div>
+                      <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200">
+                        <p className="text-sm font-semibold text-green-900 mb-1">Days Elapsed</p>
+                        <p className="text-2xl font-bold text-green-700">{inputs.acc_daysSinceLastCoupon}</p>
+                      </div>
+                      <div className="bg-amber-50 rounded-xl p-4 border-2 border-amber-200">
+                        <p className="text-sm font-semibold text-amber-900 mb-1">Days Remaining</p>
+                        <p className="text-2xl font-bold text-amber-700">{results.accrued.daysRemaining}</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-rose-50 rounded-xl p-4 border-l-4 border-rose-500">
+                      <div className="flex items-start gap-3">
+                        <Info className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-semibold text-rose-900 mb-1">Understanding Accrued Interest:</p>
+                          <p className="text-sm text-rose-800">
+                            When you buy a bond between coupon dates, the seller has earned some interest. You must pay this accrued interest to the seller.
+                            On the next coupon date, you'll receive the full coupon payment, recovering the accrued interest you paid.
+                            Formula: AI = Coupon × (Days Since Last Payment / Days in Coupon Period)
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -1313,6 +1822,270 @@ export default function BondValuation() {
                     <Bar dataKey="principal" stackId="a" fill="#10b981" name="Principal Repayment" />
                   </BarChart>
                 </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Bond Comparison Chart */}
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Bond Comparison</h3>
+                  <p className="text-gray-600">Compare multiple bonds side-by-side</p>
+                </div>
+                <button
+                  onClick={addBond}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+                >
+                  <Zap className="w-4 h-4" />
+                  Add Bond
+                </button>
+              </div>
+
+              {/* Bond Input Cards */}
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                {bonds.map(bond => (
+                  <div key={bond.id} className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-indigo-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <input
+                        type="text"
+                        value={bond.name}
+                        onChange={(e) => updateBond(bond.id, 'name', e.target.value)}
+                        className="text-lg font-bold text-indigo-900 bg-transparent border-b-2 border-indigo-300 focus:border-indigo-600 outline-none"
+                      />
+                      {bonds.length > 1 && (
+                        <button
+                          onClick={() => removeBond(bond.id)}
+                          className="p-1 text-red-600 hover:bg-red-100 rounded transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <label className="text-xs text-gray-600">Face Value ($)</label>
+                        <input
+                          type="number"
+                          value={bond.faceValue}
+                          onChange={(e) => updateBond(bond.id, 'faceValue', e.target.value)}
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:border-indigo-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600">Coupon (%)</label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          value={bond.couponRate}
+                          onChange={(e) => updateBond(bond.id, 'couponRate', e.target.value)}
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:border-indigo-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600">YTM (%)</label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          value={bond.ytm}
+                          onChange={(e) => updateBond(bond.id, 'ytm', e.target.value)}
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:border-indigo-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-600">Years</label>
+                        <input
+                          type="number"
+                          value={bond.years}
+                          onChange={(e) => updateBond(bond.id, 'years', e.target.value)}
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:border-indigo-500 outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Comparison Charts */}
+              <div className="space-y-6">
+                {/* Price Comparison */}
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-700 mb-3">Bond Prices</h4>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={generateBondComparisonData()} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis label={{ value: 'Price ($)', angle: -90, position: 'insideLeft' }} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="price" fill="#6366f1" name="Bond Price">
+                          {generateBondComparisonData().map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][index % 5]} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Duration Comparison */}
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-700 mb-3">Duration & Risk</h4>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={generateBondComparisonData()} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis label={{ value: 'Duration (Years)', angle: -90, position: 'insideLeft' }} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="duration" fill="#8b5cf6" name="Macaulay Duration" />
+                        <Bar dataKey="modifiedDuration" fill="#ec4899" name="Modified Duration" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Yield Comparison */}
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-700 mb-3">Yield Analysis</h4>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={generateBondComparisonData()} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis label={{ value: 'Yield (%)', angle: -90, position: 'insideLeft' }} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="couponRate" fill="#10b981" name="Coupon Rate" />
+                        <Bar dataKey="currentYield" fill="#f59e0b" name="Current Yield" />
+                        <Bar dataKey="ytm" fill="#ef4444" name="Yield to Maturity" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Clean vs Dirty Price Chart */}
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Clean vs Dirty Price Over Time</h3>
+              <p className="text-gray-600 mb-6">
+                See how clean and dirty prices evolve between coupon payments. Accrued interest builds up linearly.
+              </p>
+              <div className="h-96">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={generateCleanDirtyComparison()} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="day"
+                      label={{ value: 'Days Since Last Coupon', position: 'insideBottom', offset: -5 }}
+                    />
+                    <YAxis label={{ value: 'Price ($)', angle: -90, position: 'insideLeft' }} />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-white border-2 border-indigo-200 rounded-lg shadow-lg p-3">
+                              <p className="font-semibold text-gray-800 mb-2">Day {payload[0].payload.day}</p>
+                              {payload.map((entry, index) => (
+                                <p key={index} style={{ color: entry.color }} className="text-sm font-medium">
+                                  {entry.name}: ${entry.value.toFixed(2)}
+                                </p>
+                              ))}
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Legend />
+                    <Line type="monotone" dataKey="cleanPrice" stroke="#10b981" strokeWidth={3} name="Clean Price" dot={false} />
+                    <Line type="monotone" dataKey="dirtyPrice" stroke="#6366f1" strokeWidth={3} name="Dirty Price" dot={false} />
+                    <Line type="monotone" dataKey="accruedInterest" stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" name="Accrued Interest" dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="mt-6 grid md:grid-cols-3 gap-4">
+                <div className="bg-green-50 rounded-lg p-4 border-2 border-green-200">
+                  <p className="text-sm font-semibold text-green-900 mb-1">Clean Price</p>
+                  <p className="text-xs text-green-700">
+                    Remains constant between coupon dates (assuming no yield changes)
+                  </p>
+                </div>
+                <div className="bg-indigo-50 rounded-lg p-4 border-2 border-indigo-200">
+                  <p className="text-sm font-semibold text-indigo-900 mb-1">Dirty Price</p>
+                  <p className="text-xs text-indigo-700">
+                    Increases linearly as accrued interest builds up, then drops on coupon date
+                  </p>
+                </div>
+                <div className="bg-amber-50 rounded-lg p-4 border-2 border-amber-200">
+                  <p className="text-sm font-semibold text-amber-900 mb-1">Accrued Interest</p>
+                  <p className="text-xs text-amber-700">
+                    The difference between dirty and clean prices
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Accrued Interest Timeline */}
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Accrued Interest Timeline</h3>
+              <p className="text-gray-600 mb-6">
+                Watch how accrued interest accumulates day by day between coupon payments.
+              </p>
+              <div className="h-96">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={generateAccruedInterestData()} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="day"
+                      label={{ value: 'Days Since Last Coupon', position: 'insideBottom', offset: -5 }}
+                    />
+                    <YAxis label={{ value: 'Accrued Interest ($)', angle: -90, position: 'insideLeft' }} />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-white border-2 border-rose-200 rounded-lg shadow-lg p-3">
+                              <p className="font-semibold text-gray-800 mb-2">Day {payload[0].payload.day}</p>
+                              <p className="text-sm font-medium text-rose-600">
+                                Accrued Interest: ${payload[0].value}
+                              </p>
+                              <p className="text-xs text-gray-600 mt-1">
+                                {payload[0].payload.percentOfCoupon}% of next coupon
+                              </p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Legend />
+                    <Area
+                      type="monotone"
+                      dataKey="accruedInterest"
+                      stroke="#ec4899"
+                      fill="#ec4899"
+                      fillOpacity={0.6}
+                      name="Accrued Interest"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="mt-6 bg-rose-50 rounded-lg p-4 border-l-4 border-rose-500">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-rose-900 mb-1">Linear Accumulation:</p>
+                    <p className="text-sm text-rose-800">
+                      Accrued interest grows linearly from $0 on the coupon payment date to the full coupon amount just before the next payment.
+                      On the payment date, it resets to $0 and starts accumulating again. This is why dirty prices show a "sawtooth" pattern.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
