@@ -630,12 +630,326 @@ export default function StockDataAnalyzer() {
 
         {/* Portfolio Analysis Display */}
         {selectedCompanies.length > 0 && !loading && (
-        {/* Portfolio Analysis Display */}
-        {selectedCompanies.length > 0 && !loading && (
           <div className="space-y-8">
+
+            {/* Selected Companies Display */}
             <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-indigo-200">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Portfolio Analysis Coming Soon</h2>
-              <p className="text-gray-600">Selected {selectedCompanies.length} companies. Full portfolio analysis UI will be implemented next.</p>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                  <Building2 className="w-6 h-6 text-indigo-600" />
+                  Selected Companies ({selectedCompanies.length})
+                </h2>
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {selectedCompanies.map((company) => {
+                  const data = companiesData[company.symbol];
+                  const stats = data && data.returns ? calculateStatistics(data.returns) : null;
+
+                  return (
+                    <div key={company.symbol} className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border-2 border-indigo-200 relative">
+                      <button
+                        onClick={() => removeCompany(company.symbol)}
+                        className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                        title={`Remove ${company.name}`}
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+
+                      <div className="mb-3">
+                        <h3 className="text-lg font-bold text-gray-900">{company.symbol.replace('.AX', '')}</h3>
+                        <p className="text-sm text-gray-600">{company.name}</p>
+                        <span className="inline-block mt-1 px-2 py-1 bg-indigo-200 rounded text-xs font-medium text-indigo-800">
+                          {company.sector}
+                        </span>
+                      </div>
+
+                      {data && data.quote && (
+                        <div className="space-y-2 mb-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Price:</span>
+                            <span className="text-lg font-bold text-gray-900">{formatCurrency(data.quote.price)}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Change:</span>
+                            <span className={`text-sm font-semibold ${data.quote.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {data.quote.change >= 0 ? '▲' : '▼'} {formatNumber(Math.abs(data.quote.changePercent))}%
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {stats && (
+                        <div className="pt-3 border-t border-indigo-200 space-y-1">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">Expected Return:</span>
+                            <span className="font-semibold text-gray-900">{(stats.annualizedReturn * 100).toFixed(2)}%</span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">Risk (σ):</span>
+                            <span className="font-semibold text-gray-900">{(stats.annualizedRisk * 100).toFixed(2)}%</span>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="mt-3">
+                        <div className="flex justify-between items-center text-xs mb-1">
+                          <span className="text-gray-600">Portfolio Weight:</span>
+                          <span className="font-semibold text-indigo-700">{((portfolioWeights[company.symbol] || 0) * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${(portfolioWeights[company.symbol] || 0) * 100}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Portfolio Metrics Summary */}
+            {(() => {
+              const portfolioMetrics = calculatePortfolioMetrics();
+              if (!portfolioMetrics) return null;
+
+              return (
+                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 shadow-xl text-white">
+                  <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+                    <PieChart className="w-8 h-8" />
+                    Portfolio Performance Metrics
+                  </h2>
+
+                  <div className="grid md:grid-cols-4 gap-6">
+                    <div className="bg-white/10 backdrop-blur rounded-xl p-6">
+                      <p className="text-indigo-200 text-sm mb-2">Expected Return</p>
+                      <p className="text-4xl font-bold">{(portfolioMetrics.expectedReturn * 100).toFixed(2)}%</p>
+                      <p className="text-xs text-indigo-200 mt-2">Annualized</p>
+                    </div>
+
+                    <div className="bg-white/10 backdrop-blur rounded-xl p-6">
+                      <p className="text-indigo-200 text-sm mb-2">Portfolio Risk (σ)</p>
+                      <p className="text-4xl font-bold">{(portfolioMetrics.risk * 100).toFixed(2)}%</p>
+                      <p className="text-xs text-indigo-200 mt-2">Standard Deviation</p>
+                    </div>
+
+                    <div className="bg-white/10 backdrop-blur rounded-xl p-6">
+                      <p className="text-indigo-200 text-sm mb-2">Sharpe Ratio</p>
+                      <p className="text-4xl font-bold">{portfolioMetrics.sharpeRatio.toFixed(3)}</p>
+                      <p className="text-xs text-indigo-200 mt-2">Risk-adjusted Return</p>
+                    </div>
+
+                    <div className="bg-white/10 backdrop-blur rounded-xl p-6">
+                      <p className="text-indigo-200 text-sm mb-2">Variance</p>
+                      <p className="text-4xl font-bold">{(portfolioMetrics.variance * 10000).toFixed(2)}</p>
+                      <p className="text-xs text-indigo-200 mt-2">×10⁻⁴</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 bg-white/10 backdrop-blur rounded-xl p-4">
+                    <p className="text-sm text-indigo-100">
+                      <strong>Note:</strong> Risk-free rate assumed at 4.0%. Sharpe Ratio = (Expected Return - Risk-Free Rate) / Portfolio Risk
+                    </p>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Correlation Matrix */}
+            {selectedCompanies.length > 1 && (
+              <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-indigo-200">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <Activity className="w-6 h-6 text-indigo-600" />
+                  Correlation Matrix
+                </h2>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr>
+                        <th className="p-2 text-left text-xs font-semibold text-gray-600"></th>
+                        {selectedCompanies.map(company => (
+                          <th key={company.symbol} className="p-2 text-center text-xs font-semibold text-gray-600">
+                            {company.symbol.replace('.AX', '')}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedCompanies.map((company1) => {
+                        const data1 = companiesData[company1.symbol];
+                        return (
+                          <tr key={company1.symbol}>
+                            <td className="p-2 text-xs font-semibold text-gray-600">{company1.symbol.replace('.AX', '')}</td>
+                            {selectedCompanies.map((company2) => {
+                              const data2 = companiesData[company2.symbol];
+
+                              if (!data1 || !data2 || !data1.returns || !data2.returns) {
+                                return <td key={company2.symbol} className="p-2 text-center text-xs text-gray-400">-</td>;
+                              }
+
+                              const correlation = company1.symbol === company2.symbol ? 1 : calculateCorrelation(data1.returns, data2.returns);
+                              const bgColor = correlation > 0.7 ? 'bg-green-100' : correlation > 0.3 ? 'bg-yellow-100' : correlation > -0.3 ? 'bg-gray-100' : correlation > -0.7 ? 'bg-orange-100' : 'bg-red-100';
+                              const textColor = correlation > 0.7 ? 'text-green-900' : correlation > 0.3 ? 'text-yellow-900' : correlation > -0.3 ? 'text-gray-900' : correlation > -0.7 ? 'text-orange-900' : 'text-red-900';
+
+                              return (
+                                <td key={company2.symbol} className={`p-2 text-center ${bgColor}`}>
+                                  <span className={`text-xs font-semibold ${textColor}`}>
+                                    {correlation.toFixed(3)}
+                                  </span>
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center gap-4 text-xs">
+                  <span className="text-gray-600 font-semibold">Correlation strength:</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
+                    <span className="text-gray-600">Strong (+)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded"></div>
+                    <span className="text-gray-600">Moderate (+)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div>
+                    <span className="text-gray-600">Weak</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-orange-100 border border-orange-300 rounded"></div>
+                    <span className="text-gray-600">Moderate (-)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
+                    <span className="text-gray-600">Strong (-)</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Covariance Matrix */}
+            {selectedCompanies.length > 1 && (
+              <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-indigo-200">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <BarChart3 className="w-6 h-6 text-indigo-600" />
+                  Covariance Matrix (×10⁻⁴)
+                </h2>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr>
+                        <th className="p-2 text-left text-xs font-semibold text-gray-600"></th>
+                        {selectedCompanies.map(company => (
+                          <th key={company.symbol} className="p-2 text-center text-xs font-semibold text-gray-600">
+                            {company.symbol.replace('.AX', '')}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedCompanies.map((company1) => {
+                        const data1 = companiesData[company1.symbol];
+                        return (
+                          <tr key={company1.symbol}>
+                            <td className="p-2 text-xs font-semibold text-gray-600">{company1.symbol.replace('.AX', '')}</td>
+                            {selectedCompanies.map((company2) => {
+                              const data2 = companiesData[company2.symbol];
+
+                              if (!data1 || !data2 || !data1.returns || !data2.returns) {
+                                return <td key={company2.symbol} className="p-2 text-center text-xs text-gray-400">-</td>;
+                              }
+
+                              const covariance = company1.symbol === company2.symbol
+                                ? calculateStatistics(data1.returns).variance
+                                : calculateCovariance(data1.returns, data2.returns);
+
+                              return (
+                                <td key={company2.symbol} className="p-2 text-center bg-indigo-50">
+                                  <span className="text-xs font-semibold text-indigo-900">
+                                    {(covariance * 10000).toFixed(4)}
+                                  </span>
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mt-4 text-xs text-gray-600">
+                  <p><strong>Note:</strong> Values are daily covariances scaled by 10⁴ for readability. Diagonal elements represent individual stock variances.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Individual Stock Returns Distribution */}
+            <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-indigo-200">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <TrendingUp className="w-6 h-6 text-indigo-600" />
+                Individual Stock Returns Distribution
+              </h2>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {selectedCompanies.map((company) => {
+                  const data = companiesData[company.symbol];
+                  if (!data || !data.returns || data.returns.length === 0) return null;
+
+                  const stats = calculateStatistics(data.returns);
+
+                  return (
+                    <div key={company.symbol} className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border-2 border-indigo-200">
+                      <h3 className="text-lg font-bold text-gray-900 mb-3">{company.name}</h3>
+
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        <div className="bg-white rounded-lg p-3">
+                          <p className="text-xs text-gray-600 mb-1">Exp. Return</p>
+                          <p className="text-lg font-bold text-indigo-700">{(stats.annualizedReturn * 100).toFixed(2)}%</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-3">
+                          <p className="text-xs text-gray-600 mb-1">Risk (σ)</p>
+                          <p className="text-lg font-bold text-purple-700">{(stats.annualizedRisk * 100).toFixed(2)}%</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-3">
+                          <p className="text-xs text-gray-600 mb-1">Daily Mean</p>
+                          <p className="text-sm font-semibold text-gray-700">{(stats.mean * 100).toFixed(4)}%</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-3">
+                          <p className="text-xs text-gray-600 mb-1">Daily Std Dev</p>
+                          <p className="text-sm font-semibold text-gray-700">{(stats.stdDev * 100).toFixed(4)}%</p>
+                        </div>
+                      </div>
+
+                      <div className="bg-white rounded-lg p-3">
+                        <p className="text-xs text-gray-600 mb-2">Returns Distribution (Last 20 days)</p>
+                        <div className="h-32">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={data.returns.slice(-20)}>
+                              <XAxis dataKey="date" hide />
+                              <YAxis hide domain={['auto', 'auto']} />
+                              <Tooltip
+                                formatter={(value) => `${(value * 100).toFixed(2)}%`}
+                                labelFormatter={(label) => `Date: ${label}`}
+                              />
+                              <Area type="monotone" dataKey="return" stroke="#6366f1" fill="#818cf8" fillOpacity={0.6} />
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
@@ -645,11 +959,28 @@ export default function StockDataAnalyzer() {
           <div className="bg-white rounded-2xl p-12 shadow-xl border-2 border-indigo-200 text-center">
             <Building2 className="w-24 h-24 mx-auto mb-6 text-indigo-300" />
             <h3 className="text-2xl font-bold text-gray-900 mb-3">Build Your Portfolio</h3>
-            <p className="text-gray-600 max-w-md mx-auto">
-              Select multiple Australian companies from the dropdown above to analyze portfolio performance.
+            <p className="text-gray-600 max-w-md mx-auto mb-6">
+              Select multiple Australian companies from the dropdown above to analyze portfolio performance, correlations, and risk metrics.
             </p>
+            <div className="flex justify-center flex-wrap gap-4 text-sm text-gray-500">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <span>Real-time prices</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <span>Returns analysis</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <span>Correlation matrix</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <span>Portfolio metrics</span>
+              </div>
+            </div>
           </div>
-        )}          </div>
         )}
       </div>
     </div>
