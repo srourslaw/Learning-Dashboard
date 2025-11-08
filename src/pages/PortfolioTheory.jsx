@@ -1156,11 +1156,11 @@ export default function PortfolioTheory() {
                         The <strong>expected return</strong> of a portfolio is the weighted average of the expected returns of individual assets:
                       </p>
                       <div className="bg-white rounded-lg p-4 border-2 border-green-200">
-                        <div className="text-center font-mono text-lg mb-2">
-                          E[R<sub>p</sub>] = Σ w<sub>i</sub> × E[R<sub>i</sub>]
-                        </div>
+                        <DisplayEquation>
+                          {`E[R_p] = \\sum_{i=1}^{n} w_i \\times E[R_i]`}
+                        </DisplayEquation>
                         <div className="text-sm text-gray-600 text-center">
-                          where w<sub>i</sub> = weight of asset i, E[R<sub>i</sub>] = expected return of asset i
+                          where <DisplayEquation>{`w_i`}</DisplayEquation> = weight of asset i, <DisplayEquation>{`E[R_i]`}</DisplayEquation> = expected return of asset i
                         </div>
                       </div>
                       <div className="mt-4 bg-green-50 rounded-lg p-4 border border-green-200">
@@ -1182,11 +1182,11 @@ export default function PortfolioTheory() {
                       </p>
                       <div className="bg-emerald-50 rounded-lg p-4 border-2 border-emerald-200 mb-4">
                         <div className="font-bold text-center text-emerald-900 mb-2">Two-Asset Portfolio Variance:</div>
-                        <div className="text-center font-mono text-sm mb-2">
-                          σ<sub>p</sub><sup>2</sup> = w<sub>A</sub><sup>2</sup>σ<sub>A</sub><sup>2</sup> + w<sub>B</sub><sup>2</sup>σ<sub>B</sub><sup>2</sup> + 2w<sub>A</sub>w<sub>B</sub>ρ<sub>AB</sub>σ<sub>A</sub>σ<sub>B</sub>
-                        </div>
+                        <DisplayEquation>
+                          {`\\sigma_p^2 = w_A^2\\sigma_A^2 + w_B^2\\sigma_B^2 + 2w_Aw_B\\rho_{AB}\\sigma_A\\sigma_B`}
+                        </DisplayEquation>
                         <div className="text-xs text-gray-600 text-center">
-                          where ρ<sub>AB</sub> = correlation coefficient between assets A and B
+                          where <DisplayEquation>{`\\rho_{AB}`}</DisplayEquation> = correlation coefficient between assets A and B
                         </div>
                       </div>
                       <div className="grid md:grid-cols-3 gap-3">
@@ -1297,15 +1297,19 @@ export default function PortfolioTheory() {
                         <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
                           <h4 className="font-bold text-blue-900 mb-2">Sharpe Ratio</h4>
                           <p className="text-sm text-gray-700 mb-2">Measures excess return per unit of total risk:</p>
-                          <div className="bg-white rounded p-2 font-mono text-sm text-center border border-blue-300">
-                            Sharpe Ratio = (E[R<sub>p</sub>] - R<sub>f</sub>) / σ<sub>p</sub>
+                          <div className="bg-white rounded p-2 border border-blue-300">
+                            <DisplayEquation>
+                              {`\\text{Sharpe Ratio} = \\frac{E[R_p] - R_f}{\\sigma_p}`}
+                            </DisplayEquation>
                           </div>
                         </div>
                         <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
                           <h4 className="font-bold text-purple-900 mb-2">Treynor Ratio</h4>
                           <p className="text-sm text-gray-700 mb-2">Measures excess return per unit of systematic risk:</p>
-                          <div className="bg-white rounded p-2 font-mono text-sm text-center border border-purple-300">
-                            Treynor Ratio = (E[R<sub>p</sub>] - R<sub>f</sub>) / β<sub>p</sub>
+                          <div className="bg-white rounded p-2 border border-purple-300">
+                            <DisplayEquation>
+                              {`\\text{Treynor Ratio} = \\frac{E[R_p] - R_f}{\\beta_p}`}
+                            </DisplayEquation>
                           </div>
                         </div>
                       </div>
@@ -1578,9 +1582,9 @@ export default function PortfolioTheory() {
                         When a <strong>risk-free asset</strong> is available, the efficient frontier becomes a straight line from the risk-free rate through the tangency portfolio. This is the <strong>Capital Market Line (CML)</strong>.
                       </p>
                       <div className="bg-white rounded-lg p-4 border-2 border-blue-200 mb-3">
-                        <div className="font-mono text-center text-sm mb-2">
-                          E[R<sub>CML</sub>] = R<sub>f</sub> + [(E[R<sub>M</sub>] - R<sub>f</sub>) / σ<sub>M</sub>] × σ<sub>p</sub>
-                        </div>
+                        <DisplayEquation>
+                          {`E[R_{CML}] = R_f + \\left[\\frac{E[R_M] - R_f}{\\sigma_M}\\right] \\times \\sigma_p`}
+                        </DisplayEquation>
                         <div className="text-xs text-gray-600 text-center">
                           Where M = Market (Tangency) Portfolio
                         </div>
@@ -1642,21 +1646,21 @@ export default function PortfolioTheory() {
                         The <strong>Capital Asset Pricing Model (CAPM)</strong>, developed by William Sharpe in 1964, describes the relationship between systematic risk and expected return for assets, particularly stocks.
                       </p>
                       <div className="bg-white rounded-lg p-5 border-2 border-teal-300 mb-4">
-                        <div className="text-center font-mono text-xl font-bold text-teal-900 mb-3">
-                          E[R<sub>i</sub>] = R<sub>f</sub> + β<sub>i</sub> × (E[R<sub>M</sub>] - R<sub>f</sub>)
-                        </div>
-                        <div className="grid md:grid-cols-2 gap-3 text-sm">
+                        <DisplayEquation>
+                          {`E[R_i] = R_f + \\beta_i \\times (E[R_M] - R_f)`}
+                        </DisplayEquation>
+                        <div className="grid md:grid-cols-2 gap-3 text-sm mt-4">
                           <div className="bg-teal-50 rounded p-2">
-                            <strong>E[R<sub>i</sub>]</strong> = Expected return of asset i
+                            <DisplayEquation>{`E[R_i]`}</DisplayEquation> = Expected return of asset i
                           </div>
                           <div className="bg-teal-50 rounded p-2">
-                            <strong>R<sub>f</sub></strong> = Risk-free rate
+                            <DisplayEquation>{`R_f`}</DisplayEquation> = Risk-free rate
                           </div>
                           <div className="bg-teal-50 rounded p-2">
-                            <strong>β<sub>i</sub></strong> = Beta of asset i
+                            <DisplayEquation>{`\\beta_i`}</DisplayEquation> = Beta of asset i
                           </div>
                           <div className="bg-teal-50 rounded p-2">
-                            <strong>(E[R<sub>M</sub>] - R<sub>f</sub>)</strong> = Market risk premium
+                            <DisplayEquation>{`E[R_M] - R_f`}</DisplayEquation> = Market risk premium
                           </div>
                         </div>
                       </div>
