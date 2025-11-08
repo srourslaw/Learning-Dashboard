@@ -2040,16 +2040,18 @@ export default function PortfolioTheory() {
                         The <strong>Sharpe Ratio</strong> measures excess return per unit of total risk. Higher is better.
                       </p>
                       <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-200 mb-4">
-                        <DisplayEquation equation="\\text{Sharpe Ratio} = \\frac{E[R_p] - R_f}{\\sigma_p}" />
+                        <DisplayEquation>
+                          {`\\text{Sharpe Ratio} = \\frac{E[R_p] - R_f}{\\sigma_p}`}
+                        </DisplayEquation>
                         <div className="mt-3 grid md:grid-cols-3 gap-2 text-xs">
                           <div className="bg-white rounded p-2">
-                            <DisplayEquation equation="E[R_p]" /> = Portfolio expected return
+                            <DisplayEquation>{`E[R_p]`}</DisplayEquation> = Portfolio expected return
                           </div>
                           <div className="bg-white rounded p-2">
-                            <DisplayEquation equation="R_f" /> = Risk-free rate
+                            <DisplayEquation>{`R_f`}</DisplayEquation> = Risk-free rate
                           </div>
                           <div className="bg-white rounded p-2">
-                            <DisplayEquation equation="\\sigma_p" /> = Portfolio standard deviation
+                            <DisplayEquation>{`\\sigma_p`}</DisplayEquation> = Portfolio standard deviation
                           </div>
                         </div>
                       </div>
@@ -2079,7 +2081,9 @@ export default function PortfolioTheory() {
                         The <strong>Treynor Ratio</strong> measures excess return per unit of <em>systematic risk</em> (beta). Useful for well-diversified portfolios.
                       </p>
                       <div className="bg-purple-50 rounded-lg p-4 border-2 border-purple-200">
-                        <DisplayEquation equation="\\text{Treynor Ratio} = \\frac{E[R_p] - R_f}{\\beta_p}" />
+                        <DisplayEquation>
+                          {`\\text{Treynor Ratio} = \\frac{E[R_p] - R_f}{\\beta_p}`}
+                        </DisplayEquation>
                         <div className="mt-3 text-xs text-center text-gray-600">
                           Focuses on <strong>market risk only</strong>, ignoring unsystematic risk
                         </div>
@@ -2096,27 +2100,31 @@ export default function PortfolioTheory() {
                         <strong>Jensen's Alpha</strong> measures the excess return of a portfolio over what CAPM predicts. It represents the value added by active management.
                       </p>
                       <div className="bg-green-50 rounded-lg p-4 border-2 border-green-200 mb-4">
-                        <DisplayEquation equation="\\alpha = R_p - [R_f + \\beta_p(R_m - R_f)]" />
+                        <DisplayEquation>
+                          {`\\alpha = R_p - [R_f + \\beta_p(R_m - R_f)]`}
+                        </DisplayEquation>
                         <div className="mt-3 text-sm text-center text-gray-700">
-                          <DisplayEquation equation="\\alpha = \\text{Actual Return} - \\text{CAPM Expected Return}" />
+                          <DisplayEquation>
+                            {`\\alpha = \\text{Actual Return} - \\text{CAPM Expected Return}`}
+                          </DisplayEquation>
                         </div>
                       </div>
                       <div className="grid md:grid-cols-3 gap-3">
                         <div className="bg-green-100 rounded-lg p-3 border-2 border-green-400">
                           <div className="font-bold text-green-900 mb-1 flex items-center gap-1">
-                            <DisplayEquation equation="\\alpha > 0" />
+                            <DisplayEquation>{`\\alpha > 0`}</DisplayEquation>
                           </div>
                           <p className="text-xs text-gray-700"><strong className="text-green-700">Outperformance!</strong> Portfolio beat expectations</p>
                         </div>
                         <div className="bg-gray-100 rounded-lg p-3 border-2 border-gray-300">
                           <div className="font-bold text-gray-900 mb-1 flex items-center gap-1">
-                            <DisplayEquation equation="\\alpha = 0" />
+                            <DisplayEquation>{`\\alpha = 0`}</DisplayEquation>
                           </div>
                           <p className="text-xs text-gray-700">Fair performance. Matched expectations</p>
                         </div>
                         <div className="bg-red-100 rounded-lg p-3 border-2 border-red-300">
                           <div className="font-bold text-red-900 mb-1 flex items-center gap-1">
-                            <DisplayEquation equation="\\alpha < 0" />
+                            <DisplayEquation>{`\\alpha < 0`}</DisplayEquation>
                           </div>
                           <p className="text-xs text-gray-700"><strong className="text-red-700">Underperformance.</strong> Portfolio missed expectations</p>
                         </div>
@@ -2133,13 +2141,15 @@ export default function PortfolioTheory() {
                         The <strong>Information Ratio</strong> measures consistency of outperformance relative to a benchmark.
                       </p>
                       <div className="bg-indigo-50 rounded-lg p-4 border-2 border-indigo-200">
-                        <DisplayEquation equation="\\text{IR} = \\frac{R_p - R_B}{\\sigma(R_p - R_B)}" />
+                        <DisplayEquation>
+                          {`\\text{IR} = \\frac{R_p - R_B}{\\sigma(R_p - R_B)}`}
+                        </DisplayEquation>
                         <div className="mt-3 grid md:grid-cols-2 gap-2 text-xs">
                           <div className="bg-white rounded p-2">
-                            <DisplayEquation equation="R_p - R_B" /> = Excess return vs benchmark
+                            <DisplayEquation>{`R_p - R_B`}</DisplayEquation> = Excess return vs benchmark
                           </div>
                           <div className="bg-white rounded p-2">
-                            <DisplayEquation equation="\\sigma(R_p - R_B)" /> = Tracking error
+                            <DisplayEquation>{`\\sigma(R_p - R_B)`}</DisplayEquation> = Tracking error
                           </div>
                         </div>
                       </div>
@@ -2160,7 +2170,9 @@ export default function PortfolioTheory() {
                         The <strong>Sortino Ratio</strong> is similar to Sharpe but only considers <em>downside</em> risk (negative volatility).
                       </p>
                       <div className="bg-orange-50 rounded-lg p-4 border-2 border-orange-200">
-                        <DisplayEquation equation="\\text{Sortino Ratio} = \\frac{E[R_p] - R_f}{\\sigma_{\\text{downside}}}" />
+                        <DisplayEquation>
+                          {`\\text{Sortino Ratio} = \\frac{E[R_p] - R_f}{\\sigma_{\\text{downside}}}`}
+                        </DisplayEquation>
                         <div className="mt-3 text-xs text-center text-gray-600">
                           More relevant than Sharpe for investors who only care about <strong>downside volatility</strong>
                         </div>
@@ -2177,14 +2189,18 @@ export default function PortfolioTheory() {
                         <strong>Maximum Drawdown</strong> measures the largest peak-to-trough decline in portfolio value. It shows worst-case historical loss.
                       </p>
                       <div className="bg-red-50 rounded-lg p-4 border-2 border-red-200">
-                        <DisplayEquation equation="\\text{MDD} = \\frac{\\text{Trough Value} - \\text{Peak Value}}{\\text{Peak Value}}" />
+                        <DisplayEquation>
+                          {`\\text{MDD} = \\frac{\\text{Trough Value} - \\text{Peak Value}}{\\text{Peak Value}}`}
+                        </DisplayEquation>
                       </div>
                       <div className="mt-4 bg-white rounded-lg p-4 border border-red-200">
                         <p className="text-sm text-gray-700 mb-2">
                           <strong className="text-red-800">Example:</strong> Portfolio grows from $100k to $150k (peak), then falls to $120k (trough):
                         </p>
                         <div className="bg-red-50 rounded p-3 font-mono text-sm text-center">
-                          <DisplayEquation equation="\\text{MDD} = \\frac{120,000 - 150,000}{150,000} = -20\\%" />
+                          <DisplayEquation>
+                            {`\\text{MDD} = \\frac{120,000 - 150,000}{150,000} = -20\\%`}
+                          </DisplayEquation>
                         </div>
                       </div>
                     </div>
