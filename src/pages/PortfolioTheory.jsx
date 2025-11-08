@@ -980,10 +980,141 @@ export default function PortfolioTheory() {
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
-                    <p className="text-gray-700 text-center">
-                      Content coming soon...
-                    </p>
+                  <div className="space-y-6">
+                    {/* Introduction */}
+                    <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-xl p-6 border-2 border-blue-300 shadow-lg">
+                      <h3 className="text-2xl font-bold text-blue-900 mb-4">What is Portfolio Theory?</h3>
+                      <p className="text-gray-700 leading-relaxed mb-4">
+                        <strong className="text-blue-800">Modern Portfolio Theory (MPT)</strong>, developed by <strong>Harry Markowitz</strong> in 1952, revolutionized investment management by introducing a mathematical framework for constructing portfolios that maximize expected return for a given level of risk, or minimize risk for a given level of expected return.
+                      </p>
+                      <p className="text-gray-700 leading-relaxed">
+                        The fundamental insight of MPT is that an asset's risk and return should not be assessed in isolation, but rather by how the asset contributes to a portfolio's overall risk and return. This insight laid the foundation for modern finance and earned Markowitz the Nobel Prize in Economics in 1990.
+                      </p>
+                    </div>
+
+                    {/* Key Contributors */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-indigo-200 shadow-md">
+                      <h3 className="text-xl font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                        <Users className="w-5 h-5" />
+                        Key Contributors to Portfolio Theory
+                      </h3>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                          <h4 className="font-bold text-blue-900 mb-2">Harry Markowitz (1952)</h4>
+                          <p className="text-sm text-gray-700">Introduced Modern Portfolio Theory, demonstrating that diversification can reduce portfolio risk without sacrificing returns.</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-4 border border-indigo-200">
+                          <h4 className="font-bold text-indigo-900 mb-2">William Sharpe (1964)</h4>
+                          <p className="text-sm text-gray-700">Developed the Capital Asset Pricing Model (CAPM) and the Sharpe Ratio, simplifying portfolio selection.</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                          <h4 className="font-bold text-purple-900 mb-2">James Tobin (1958)</h4>
+                          <p className="text-sm text-gray-700">Extended Markowitz's work by introducing the risk-free asset, leading to the Separation Theorem.</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-4 border border-pink-200">
+                          <h4 className="font-bold text-pink-900 mb-2">Stephen Ross (1976)</h4>
+                          <p className="text-sm text-gray-700">Proposed the Arbitrage Pricing Theory (APT) as an alternative to CAPM with multiple risk factors.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Core Principles */}
+                    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border-2 border-indigo-300 shadow-lg">
+                      <h3 className="text-xl font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                        <BookOpen className="w-5 h-5" />
+                        Core Principles of Portfolio Theory
+                      </h3>
+                      <div className="space-y-3">
+                        <div className="flex gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">1</div>
+                          <div>
+                            <h4 className="font-bold text-gray-800">Risk-Return Tradeoff</h4>
+                            <p className="text-sm text-gray-700">Higher expected returns come with higher risk. Investors must balance their desire for low risk with their desire for high returns.</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold">2</div>
+                          <div>
+                            <h4 className="font-bold text-gray-800">Diversification Benefits</h4>
+                            <p className="text-sm text-gray-700">Combining assets with less-than-perfect correlation reduces portfolio risk below the weighted average of individual asset risks.</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">3</div>
+                          <div>
+                            <h4 className="font-bold text-gray-800">Efficient Portfolios</h4>
+                            <p className="text-sm text-gray-700">An efficient portfolio offers the highest expected return for a given level of risk, or the lowest risk for a given expected return.</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 bg-pink-500 text-white rounded-full flex items-center justify-center font-bold">4</div>
+                          <div>
+                            <h4 className="font-bold text-gray-800">Rational Investor Assumption</h4>
+                            <p className="text-sm text-gray-700">Investors are risk-averse and seek to maximize utility by optimizing the risk-return profile of their portfolios.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Real-World Applications */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-blue-200 shadow-md">
+                      <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+                        <Briefcase className="w-5 h-5" />
+                        Real-World Applications
+                      </h3>
+                      <div className="grid md:grid-cols-3 gap-4">
+                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+                          <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mb-3">
+                            <Building2 className="w-6 h-6 text-white" />
+                          </div>
+                          <h4 className="font-bold text-green-900 mb-2">Mutual Funds</h4>
+                          <p className="text-sm text-gray-700">Fund managers use MPT to construct diversified portfolios aligned with specific risk-return objectives.</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 border border-blue-200">
+                          <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mb-3">
+                            <TrendingUp className="w-6 h-6 text-white" />
+                          </div>
+                          <h4 className="font-bold text-blue-900 mb-2">Pension Funds</h4>
+                          <p className="text-sm text-gray-700">Large institutional investors apply portfolio theory to manage trillions in retirement assets.</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-200">
+                          <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mb-3">
+                            <Users className="w-6 h-6 text-white" />
+                          </div>
+                          <h4 className="font-bold text-purple-900 mb-2">Robo-Advisors</h4>
+                          <p className="text-sm text-gray-700">Automated platforms use MPT algorithms to provide personalized portfolio recommendations.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Journey Ahead */}
+                    <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
+                      <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
+                        <Lightbulb className="w-5 h-5" />
+                        Your Learning Journey
+                      </h3>
+                      <p className="leading-relaxed mb-4">
+                        In this comprehensive module, you'll master the essential concepts of portfolio theory through interactive simulations, real-world examples, and hands-on practice problems. You'll learn how to:
+                      </p>
+                      <ul className="space-y-2 ml-4">
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                          <span>Calculate portfolio risk and return using variance-covariance matrices</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                          <span>Construct efficient frontiers and identify optimal portfolios</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                          <span>Apply the Capital Asset Pricing Model to price risky assets</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                          <span>Use optimization techniques to maximize portfolio performance</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1003,10 +1134,171 @@ export default function PortfolioTheory() {
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
-                    <p className="text-gray-700 text-center">
-                      Content coming soon...
-                    </p>
+                  <div className="space-y-6">
+                    {/* Expected Return */}
+                    <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-xl p-6 border-2 border-green-300 shadow-lg">
+                      <h3 className="text-2xl font-bold text-green-900 mb-4 flex items-center gap-2">
+                        <DollarSign className="w-6 h-6" />
+                        Expected Return
+                      </h3>
+                      <p className="text-gray-700 leading-relaxed mb-4">
+                        The <strong>expected return</strong> of a portfolio is the weighted average of the expected returns of individual assets:
+                      </p>
+                      <div className="bg-white rounded-lg p-4 border-2 border-green-200">
+                        <div className="text-center font-mono text-lg mb-2">
+                          E[R<sub>p</sub>] = Σ w<sub>i</sub> × E[R<sub>i</sub>]
+                        </div>
+                        <div className="text-sm text-gray-600 text-center">
+                          where w<sub>i</sub> = weight of asset i, E[R<sub>i</sub>] = expected return of asset i
+                        </div>
+                      </div>
+                      <div className="mt-4 bg-green-50 rounded-lg p-4 border border-green-200">
+                        <p className="text-sm text-gray-700">
+                          <strong className="text-green-800">Example:</strong> A portfolio with 60% in Stock A (E[R] = 12%) and 40% in Stock B (E[R] = 8%) has an expected return of: <br/>
+                          <span className="font-mono text-green-900 font-bold">E[R<sub>p</sub>] = 0.6(12%) + 0.4(8%) = 10.4%</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Portfolio Risk */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-emerald-200 shadow-md">
+                      <h3 className="text-2xl font-bold text-emerald-900 mb-4 flex items-center gap-2">
+                        <AlertTriangle className="w-6 h-6" />
+                        Portfolio Risk (Variance and Standard Deviation)
+                      </h3>
+                      <p className="text-gray-700 leading-relaxed mb-4">
+                        Unlike return, portfolio risk is <strong>NOT</strong> simply the weighted average of individual asset risks. It depends on correlations between assets:
+                      </p>
+                      <div className="bg-emerald-50 rounded-lg p-4 border-2 border-emerald-200 mb-4">
+                        <div className="font-bold text-center text-emerald-900 mb-2">Two-Asset Portfolio Variance:</div>
+                        <div className="text-center font-mono text-sm mb-2">
+                          σ<sub>p</sub><sup>2</sup> = w<sub>A</sub><sup>2</sup>σ<sub>A</sub><sup>2</sup> + w<sub>B</sub><sup>2</sup>σ<sub>B</sub><sup>2</sup> + 2w<sub>A</sub>w<sub>B</sub>ρ<sub>AB</sub>σ<sub>A</sub>σ<sub>B</sub>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center">
+                          where ρ<sub>AB</sub> = correlation coefficient between assets A and B
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-3 gap-3">
+                        <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-3 border border-red-200">
+                          <h4 className="font-bold text-red-900 mb-1 text-sm">ρ = +1 (Perfect Positive)</h4>
+                          <p className="text-xs text-gray-700">No diversification benefit. Portfolio risk = weighted average</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-3 border border-yellow-200">
+                          <h4 className="font-bold text-yellow-900 mb-1 text-sm">ρ = 0 (Uncorrelated)</h4>
+                          <p className="text-xs text-gray-700">Moderate diversification. Risk reduced but not eliminated</p>
+                        </div>
+                        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-3 border border-green-200">
+                          <h4 className="font-bold text-green-900 mb-1 text-sm">ρ = -1 (Perfect Negative)</h4>
+                          <p className="text-xs text-gray-700">Maximum diversification. Risk can be eliminated completely!</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Types of Risk */}
+                    <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-6 border-2 border-teal-300 shadow-lg">
+                      <h3 className="text-2xl font-bold text-teal-900 mb-4 flex items-center gap-2">
+                        <Shield className="w-6 h-6" />
+                        Types of Risk
+                      </h3>
+                      <div className="space-y-4">
+                        <div className="bg-white rounded-lg p-4 border-2 border-orange-200">
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <TrendingDown className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-orange-900 mb-2">Systematic Risk (Market Risk)</h4>
+                              <p className="text-sm text-gray-700 mb-2">Risk that affects all securities in the market. <strong>Cannot be diversified away.</strong></p>
+                              <p className="text-xs text-gray-600 bg-orange-50 rounded p-2 border border-orange-200">
+                                Examples: Interest rate changes, inflation, recession, geopolitical events
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border-2 border-blue-200">
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Target className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-blue-900 mb-2">Unsystematic Risk (Specific Risk)</h4>
+                              <p className="text-sm text-gray-700 mb-2">Risk specific to individual securities or sectors. <strong>Can be diversified away.</strong></p>
+                              <p className="text-xs text-gray-600 bg-blue-50 rounded p-2 border border-blue-200">
+                                Examples: Company bankruptcy, management changes, product failures, strikes
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4 bg-teal-100 rounded-lg p-4 border-2 border-teal-400">
+                        <p className="text-sm text-teal-900 font-semibold text-center">
+                          Total Risk = Systematic Risk + Unsystematic Risk
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Risk-Return Tradeoff */}
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border-2 border-purple-300 shadow-lg">
+                      <h3 className="text-2xl font-bold text-purple-900 mb-4 flex items-center gap-2">
+                        <BarChart3 className="w-6 h-6" />
+                        The Risk-Return Tradeoff
+                      </h3>
+                      <p className="text-gray-700 leading-relaxed mb-4">
+                        The fundamental principle of investing: <strong>higher expected returns require accepting higher risk.</strong> This tradeoff is why investors demand different returns for different assets.
+                      </p>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-lg p-4 border-2 border-green-200">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                              <TrendingDown className="w-5 h-5 text-white" />
+                            </div>
+                            <h4 className="font-bold text-green-900">Low Risk, Low Return</h4>
+                          </div>
+                          <ul className="space-y-1 text-sm text-gray-700">
+                            <li>• Treasury Bills: ~3-4%</li>
+                            <li>• High-grade Bonds: ~4-6%</li>
+                            <li>• Money Market Funds: ~3-5%</li>
+                          </ul>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border-2 border-red-200">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                              <TrendingUp className="w-5 h-5 text-white" />
+                            </div>
+                            <h4 className="font-bold text-red-900">High Risk, High Return</h4>
+                          </div>
+                          <ul className="space-y-1 text-sm text-gray-700">
+                            <li>• Stocks: ~8-12% (historical)</li>
+                            <li>• Emerging Markets: ~10-15%</li>
+                            <li>• Venture Capital: ~15-25%</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Key Metrics */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-green-200 shadow-md">
+                      <h3 className="text-xl font-bold text-green-900 mb-4 flex items-center gap-2">
+                        <Calculator className="w-5 h-5" />
+                        Key Risk-Adjusted Performance Metrics
+                      </h3>
+                      <div className="space-y-3">
+                        <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                          <h4 className="font-bold text-blue-900 mb-2">Sharpe Ratio</h4>
+                          <p className="text-sm text-gray-700 mb-2">Measures excess return per unit of total risk:</p>
+                          <div className="bg-white rounded p-2 font-mono text-sm text-center border border-blue-300">
+                            Sharpe Ratio = (E[R<sub>p</sub>] - R<sub>f</sub>) / σ<sub>p</sub>
+                          </div>
+                        </div>
+                        <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                          <h4 className="font-bold text-purple-900 mb-2">Treynor Ratio</h4>
+                          <p className="text-sm text-gray-700 mb-2">Measures excess return per unit of systematic risk:</p>
+                          <div className="bg-white rounded p-2 font-mono text-sm text-center border border-purple-300">
+                            Treynor Ratio = (E[R<sub>p</sub>] - R<sub>f</sub>) / β<sub>p</sub>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1026,10 +1318,146 @@ export default function PortfolioTheory() {
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border-2 border-purple-200">
-                    <p className="text-gray-700 text-center">
-                      Content coming soon...
-                    </p>
+                  <div className="space-y-6">
+                    {/* Main Concept */}
+                    <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 rounded-xl p-6 border-2 border-purple-300 shadow-lg">
+                      <h3 className="text-2xl font-bold text-purple-900 mb-4">The Power of Diversification</h3>
+                      <p className="text-gray-700 leading-relaxed mb-4">
+                        <strong className="text-purple-800">"Don't put all your eggs in one basket"</strong> - This age-old wisdom is the essence of diversification. By spreading investments across different assets, you can reduce portfolio risk without necessarily reducing expected returns.
+                      </p>
+                      <div className="bg-white rounded-lg p-4 border-2 border-purple-200">
+                        <p className="text-center text-lg font-bold text-purple-900 mb-2">
+                          The Diversification Effect
+                        </p>
+                        <p className="text-center text-gray-700">
+                          Portfolio Risk &lt; Weighted Average of Individual Asset Risks
+                        </p>
+                        <p className="text-center text-sm text-gray-600 mt-2">
+                          (when correlation &lt; +1)
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* How Correlation Affects Diversification */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-pink-200 shadow-md">
+                      <h3 className="text-xl font-bold text-pink-900 mb-4">Impact of Correlation on Diversification</h3>
+                      <div className="space-y-3">
+                        <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-4 border-2 border-red-300">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="text-2xl font-bold text-red-700">ρ = +1.0</div>
+                            <div className="text-sm font-semibold text-red-900">Perfect Positive Correlation</div>
+                          </div>
+                          <p className="text-sm text-gray-700"><strong>Zero diversification benefit.</strong> Assets move in perfect lockstep. Portfolio risk = weighted average.</p>
+                        </div>
+                        <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4 border-2 border-orange-300">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="text-2xl font-bold text-orange-700">ρ = +0.5</div>
+                            <div className="text-sm font-semibold text-orange-900">Moderate Positive Correlation</div>
+                          </div>
+                          <p className="text-sm text-gray-700"><strong>Moderate diversification.</strong> Assets tend to move together but not perfectly. Some risk reduction achieved.</p>
+                        </div>
+                        <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg p-4 border-2 border-yellow-300">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="text-2xl font-bold text-yellow-700">ρ = 0.0</div>
+                            <div className="text-sm font-semibold text-yellow-900">Zero Correlation</div>
+                          </div>
+                          <p className="text-sm text-gray-700"><strong>Good diversification.</strong> Assets move independently. Significant risk reduction possible.</p>
+                        </div>
+                        <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 border-2 border-green-300">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="text-2xl font-bold text-green-700">ρ = -1.0</div>
+                            <div className="text-sm font-semibold text-green-900">Perfect Negative Correlation</div>
+                          </div>
+                          <p className="text-sm text-gray-700"><strong>Maximum diversification!</strong> Assets move in opposite directions. Risk can theoretically be eliminated completely.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Benefits Grid */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-5 border-2 border-blue-300 shadow-md">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Shield className="w-6 h-6 text-blue-700" />
+                          <h4 className="font-bold text-blue-900 text-lg">Risk Reduction</h4>
+                        </div>
+                        <p className="text-sm text-gray-700 mb-3">Diversification reduces unsystematic (company-specific) risk through:</p>
+                        <ul className="space-y-1 text-sm text-gray-700">
+                          <li>• Spreading across different industries</li>
+                          <li>• Mixing different asset classes</li>
+                          <li>• Geographic diversification</li>
+                          <li>• Time diversification (dollar-cost averaging)</li>
+                        </ul>
+                      </div>
+                      <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 border-2 border-green-300 shadow-md">
+                        <div className="flex items-center gap-2 mb-3">
+                          <TrendingUp className="w-6 h-6 text-green-700" />
+                          <h4 className="font-bold text-green-900 text-lg">Return Stability</h4>
+                        </div>
+                        <p className="text-sm text-gray-700 mb-3">Well-diversified portfolios provide:</p>
+                        <ul className="space-y-1 text-sm text-gray-700">
+                          <li>• More consistent returns over time</li>
+                          <li>• Reduced volatility</li>
+                          <li>• Lower probability of extreme losses</li>
+                          <li>• Better sleep at night!</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Optimal Number of Stocks */}
+                    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border-2 border-indigo-300 shadow-lg">
+                      <h3 className="text-xl font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                        <PieChart className="w-5 h-5" />
+                        How Many Stocks Do You Need?
+                      </h3>
+                      <div className="bg-white rounded-lg p-4 border-2 border-indigo-200 mb-4">
+                        <p className="text-gray-700 mb-3">Research shows that diversification benefits increase rapidly at first, then level off:</p>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                          <div className="bg-red-50 rounded p-2 border border-red-200">
+                            <div className="font-bold text-red-900">1 Stock</div>
+                            <div className="text-xs text-gray-600">High Risk</div>
+                          </div>
+                          <div className="bg-orange-50 rounded p-2 border border-orange-200">
+                            <div className="font-bold text-orange-900">10 Stocks</div>
+                            <div className="text-xs text-gray-600">~70% benefit</div>
+                          </div>
+                          <div className="bg-yellow-50 rounded p-2 border border-yellow-200">
+                            <div className="font-bold text-yellow-900">20 Stocks</div>
+                            <div className="text-xs text-gray-600">~85% benefit</div>
+                          </div>
+                          <div className="bg-green-50 rounded p-2 border border-green-200">
+                            <div className="font-bold text-green-900">30+ Stocks</div>
+                            <div className="text-xs text-gray-600">~90-95% benefit</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-indigo-100 rounded-lg p-4 border-2 border-indigo-300">
+                        <p className="text-sm text-indigo-900 font-semibold text-center">
+                          Most diversification benefits achieved with 20-30 stocks across different sectors
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Limitations */}
+                    <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6 border-2 border-orange-300 shadow-lg">
+                      <h3 className="text-xl font-bold text-orange-900 mb-4 flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5" />
+                        Limitations of Diversification
+                      </h3>
+                      <div className="space-y-3">
+                        <div className="bg-white rounded-lg p-4 border border-orange-200">
+                          <h4 className="font-bold text-gray-800 mb-2">Cannot Eliminate Systematic Risk</h4>
+                          <p className="text-sm text-gray-700">Market-wide events (recession, interest rate changes) affect all securities. Diversification only reduces unsystematic risk.</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border border-orange-200">
+                          <h4 className="font-bold text-gray-800 mb-2">Over-Diversification ("Diworsification")</h4>
+                          <p className="text-sm text-gray-700">Too many holdings can dilute returns, increase transaction costs, and make portfolio management difficult.</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border border-orange-200">
+                          <h4 className="font-bold text-gray-800 mb-2">Correlation Changes in Crisis</h4>
+                          <p className="text-sm text-gray-700">During market crashes, correlations tend to increase toward +1, reducing diversification benefits when needed most.</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1049,10 +1477,133 @@ export default function PortfolioTheory() {
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-6 border-2 border-orange-200">
-                    <p className="text-gray-700 text-center">
-                      Content coming soon...
-                    </p>
+                  <div className="space-y-6">
+                    {/* Main Concept */}
+                    <div className="bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 rounded-xl p-6 border-2 border-orange-300 shadow-lg">
+                      <h3 className="text-2xl font-bold text-orange-900 mb-4">What is the Efficient Frontier?</h3>
+                      <p className="text-gray-700 leading-relaxed mb-4">
+                        The <strong>Efficient Frontier</strong> is the set of optimal portfolios that offer the highest expected return for a defined level of risk, or the lowest risk for a given level of expected return. Portfolios that lie below the efficient frontier are sub-optimal.
+                      </p>
+                      <div className="bg-white rounded-lg p-4 border-2 border-orange-200">
+                        <p className="text-center font-semibold text-orange-900 mb-2">Key Principle:</p>
+                        <p className="text-center text-gray-700">For any portfolio NOT on the efficient frontier, there exists a better portfolio with either:</p>
+                        <div className="grid md:grid-cols-2 gap-2 mt-3">
+                          <div className="bg-green-50 rounded p-2 text-center text-sm border border-green-200">
+                            <strong>Same risk</strong>, higher return
+                          </div>
+                          <div className="bg-blue-50 rounded p-2 text-center text-sm border border-blue-200">
+                            <strong>Same return</strong>, lower risk
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Key Portfolios */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-red-200 shadow-md">
+                      <h3 className="text-xl font-bold text-red-900 mb-4">Key Portfolios on the Efficient Frontier</h3>
+                      <div className="space-y-3">
+                        <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg p-4 border-2 border-yellow-300">
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Target className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-yellow-900 mb-2">Minimum Variance Portfolio (MVP)</h4>
+                              <p className="text-sm text-gray-700">The portfolio with the lowest possible risk (variance). Located at the leftmost point of the efficient frontier.</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4 border-2 border-orange-300">
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <TrendingUp className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-orange-900 mb-2">Tangency Portfolio</h4>
+                              <p className="text-sm text-gray-700">The portfolio with the highest Sharpe Ratio. Represents the optimal risky portfolio when a risk-free asset is available.</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Two Regions */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-5 border-2 border-red-300 shadow-md">
+                        <div className="flex items-center gap-2 mb-3">
+                          <XCircle className="w-6 h-6 text-red-700" />
+                          <h4 className="font-bold text-red-900 text-lg">Inefficient Region</h4>
+                        </div>
+                        <p className="text-sm text-gray-700 mb-2">Portfolios <strong>below</strong> the MVP:</p>
+                        <ul className="space-y-1 text-sm text-gray-700">
+                          <li>• Higher risk for given return</li>
+                          <li>• Suboptimal diversification</li>
+                          <li>• Should be avoided</li>
+                          <li>• Sometimes called "inefficient frontier"</li>
+                        </ul>
+                      </div>
+                      <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 border-2 border-green-300 shadow-md">
+                        <div className="flex items-center gap-2 mb-3">
+                          <CheckCircle2 className="w-6 h-6 text-green-700" />
+                          <h4 className="font-bold text-green-900 text-lg">Efficient Region</h4>
+                        </div>
+                        <p className="text-sm text-gray-700 mb-2">Portfolios <strong>on or above</strong> the MVP:</p>
+                        <ul className="space-y-1 text-sm text-gray-700">
+                          <li>• Optimal risk-return tradeoff</li>
+                          <li>• Cannot be improved upon</li>
+                          <li>• Where investors should choose</li>
+                          <li>• The "efficient frontier"</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* With Risk-Free Asset */}
+                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 border-2 border-blue-300 shadow-lg">
+                      <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+                        <LineChartIcon className="w-5 h-5" />
+                        Capital Market Line (CML)
+                      </h3>
+                      <p className="text-gray-700 leading-relaxed mb-4">
+                        When a <strong>risk-free asset</strong> is available, the efficient frontier becomes a straight line from the risk-free rate through the tangency portfolio. This is the <strong>Capital Market Line (CML)</strong>.
+                      </p>
+                      <div className="bg-white rounded-lg p-4 border-2 border-blue-200 mb-3">
+                        <div className="font-mono text-center text-sm mb-2">
+                          E[R<sub>CML</sub>] = R<sub>f</sub> + [(E[R<sub>M</sub>] - R<sub>f</sub>) / σ<sub>M</sub>] × σ<sub>p</sub>
+                        </div>
+                        <div className="text-xs text-gray-600 text-center">
+                          Where M = Market (Tangency) Portfolio
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-3">
+                        <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                          <h5 className="font-bold text-blue-900 mb-1 text-sm">Lending Portfolios</h5>
+                          <p className="text-xs text-gray-700">Combine risk-free asset + tangency portfolio. Lower risk than tangency portfolio alone.</p>
+                        </div>
+                        <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                          <h5 className="font-bold text-purple-900 mb-1 text-sm">Borrowing Portfolios</h5>
+                          <p className="text-xs text-gray-700">Borrow at risk-free rate to invest more in tangency portfolio. Higher risk and return.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Separation Theorem */}
+                    <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+                      <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
+                        <Lightbulb className="w-5 h-5" />
+                        Tobin's Separation Theorem
+                      </h3>
+                      <p className="leading-relaxed mb-3">
+                        The portfolio selection problem can be separated into two independent tasks:
+                      </p>
+                      <div className="space-y-2">
+                        <div className="bg-white bg-opacity-20 rounded-lg p-3">
+                          <strong>1. Determination of the optimal risky portfolio</strong> (Tangency Portfolio) - Same for all investors regardless of risk preferences
+                        </div>
+                        <div className="bg-white bg-opacity-20 rounded-lg p-3">
+                          <strong>2. Allocation between risk-free asset and risky portfolio</strong> - Depends on individual risk tolerance
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1072,10 +1623,178 @@ export default function PortfolioTheory() {
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-6 border-2 border-teal-200">
-                    <p className="text-gray-700 text-center">
-                      Content coming soon...
-                    </p>
+                  <div className="space-y-6">
+                    {/* CAPM Formula */}
+                    <div className="bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 rounded-xl p-6 border-2 border-teal-300 shadow-lg">
+                      <h3 className="text-2xl font-bold text-teal-900 mb-4">The CAPM Formula</h3>
+                      <p className="text-gray-700 leading-relaxed mb-4">
+                        The <strong>Capital Asset Pricing Model (CAPM)</strong>, developed by William Sharpe in 1964, describes the relationship between systematic risk and expected return for assets, particularly stocks.
+                      </p>
+                      <div className="bg-white rounded-lg p-5 border-2 border-teal-300 mb-4">
+                        <div className="text-center font-mono text-xl font-bold text-teal-900 mb-3">
+                          E[R<sub>i</sub>] = R<sub>f</sub> + β<sub>i</sub> × (E[R<sub>M</sub>] - R<sub>f</sub>)
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-3 text-sm">
+                          <div className="bg-teal-50 rounded p-2">
+                            <strong>E[R<sub>i</sub>]</strong> = Expected return of asset i
+                          </div>
+                          <div className="bg-teal-50 rounded p-2">
+                            <strong>R<sub>f</sub></strong> = Risk-free rate
+                          </div>
+                          <div className="bg-teal-50 rounded p-2">
+                            <strong>β<sub>i</sub></strong> = Beta of asset i
+                          </div>
+                          <div className="bg-teal-50 rounded p-2">
+                            <strong>(E[R<sub>M</sub>] - R<sub>f</sub>)</strong> = Market risk premium
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-teal-100 rounded-lg p-4 border-2 border-teal-400">
+                        <p className="text-sm text-teal-900 font-semibold text-center">
+                          Expected Return = Risk-Free Rate + (Beta × Market Risk Premium)
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Understanding Beta */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-cyan-200 shadow-md">
+                      <h3 className="text-xl font-bold text-cyan-900 mb-4 flex items-center gap-2">
+                        <Activity className="w-5 h-5" />
+                        Understanding Beta (β)
+                      </h3>
+                      <p className="text-gray-700 mb-4">
+                        <strong>Beta</strong> measures how sensitive an asset's returns are to market movements. It quantifies <strong>systematic risk</strong>:
+                      </p>
+                      <div className="space-y-2">
+                        <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3 border border-blue-200">
+                          <div className="flex items-center gap-3">
+                            <div className="text-xl font-bold text-blue-700 min-w-[60px]">β = 1.0</div>
+                            <div className="text-sm text-gray-700">Asset moves exactly with the market (e.g., S&P 500 index fund)</div>
+                          </div>
+                        </div>
+                        <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-3 border border-purple-200">
+                          <div className="flex items-center gap-3">
+                            <div className="text-xl font-bold text-purple-700 min-w-[60px]">β &gt; 1.0</div>
+                            <div className="text-sm text-gray-700">More volatile than market (e.g., tech stocks, β=1.5 means 50% more volatile)</div>
+                          </div>
+                        </div>
+                        <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-3 border border-green-200">
+                          <div className="flex items-center gap-3">
+                            <div className="text-xl font-bold text-green-700 min-w-[60px]">β &lt; 1.0</div>
+                            <div className="text-sm text-gray-700">Less volatile than market (e.g., utility stocks, β=0.5 means 50% less volatile)</div>
+                          </div>
+                        </div>
+                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-3 border border-gray-200">
+                          <div className="flex items-center gap-3">
+                            <div className="text-xl font-bold text-gray-700 min-w-[60px]">β = 0.0</div>
+                            <div className="text-sm text-gray-700">No correlation with market (e.g., risk-free assets like T-bills)</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Security Market Line */}
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-300 shadow-lg">
+                      <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+                        <LineChartIcon className="w-5 h-5" />
+                        Security Market Line (SML)
+                      </h3>
+                      <p className="text-gray-700 mb-4">
+                        The <strong>Security Market Line</strong> is the graphical representation of the CAPM, showing the relationship between beta and expected return.
+                      </p>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-lg p-4 border-2 border-green-200">
+                          <div className="flex items-center gap-2 mb-2">
+                            <TrendingUp className="w-5 h-5 text-green-700" />
+                            <h4 className="font-bold text-green-900">Above SML</h4>
+                          </div>
+                          <p className="text-sm text-gray-700"><strong className="text-green-700">Undervalued!</strong> Asset offers higher return than CAPM predicts for its risk level. <strong>Buy opportunity.</strong></p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border-2 border-red-200">
+                          <div className="flex items-center gap-2 mb-2">
+                            <TrendingDown className="w-5 h-5 text-red-700" />
+                            <h4 className="font-bold text-red-900">Below SML</h4>
+                          </div>
+                          <p className="text-sm text-gray-700"><strong className="text-red-700">Overvalued!</strong> Asset offers lower return than CAPM predicts for its risk level. <strong>Sell opportunity.</strong></p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Key Assumptions */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-teal-200 shadow-md">
+                      <h3 className="text-xl font-bold text-teal-900 mb-4 flex items-center gap-2">
+                        <BookOpen className="w-5 h-5" />
+                        CAPM Assumptions
+                      </h3>
+                      <div className="grid md:grid-cols-2 gap-3">
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-gray-700">✓ Investors are rational and risk-averse</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-gray-700">✓ No transaction costs or taxes</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-gray-700">✓ All investors have same information</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-gray-700">✓ Investors can borrow/lend at risk-free rate</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-gray-700">✓ Single period investment horizon</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-gray-700">✓ Assets are infinitely divisible</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Practical Applications */}
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border-2 border-purple-300 shadow-lg">
+                      <h3 className="text-xl font-bold text-purple-900 mb-4 flex items-center gap-2">
+                        <Briefcase className="w-5 h-5" />
+                        Practical Applications of CAPM
+                      </h3>
+                      <div className="space-y-3">
+                        <div className="bg-white rounded-lg p-4 border border-purple-200">
+                          <h4 className="font-bold text-gray-800 mb-2">1. Cost of Equity Capital</h4>
+                          <p className="text-sm text-gray-700">Companies use CAPM to estimate the required return on equity, which is used in capital budgeting decisions.</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border border-purple-200">
+                          <h4 className="font-bold text-gray-800 mb-2">2. Performance Evaluation</h4>
+                          <p className="text-sm text-gray-700">Jensen's Alpha measures portfolio performance by comparing actual returns to CAPM-predicted returns.</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border border-purple-200">
+                          <h4 className="font-bold text-gray-800 mb-2">3. Securities Valuation</h4>
+                          <p className="text-sm text-gray-700">Analysts use CAPM to determine fair value and identify mispriced securities.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Limitations */}
+                    <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6 border-2 border-orange-300 shadow-lg">
+                      <h3 className="text-xl font-bold text-orange-900 mb-4 flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5" />
+                        Criticisms and Limitations
+                      </h3>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex gap-2">
+                          <span className="text-orange-600">•</span>
+                          <span><strong>Unrealistic assumptions</strong> - Markets aren't perfect, transaction costs exist</span>
+                        </li>
+                        <li className="flex gap-2">
+                          <span className="text-orange-600">•</span>
+                          <span><strong>Single-factor model</strong> - Fama-French suggests multiple factors affect returns</span>
+                        </li>
+                        <li className="flex gap-2">
+                          <span className="text-orange-600">•</span>
+                          <span><strong>Beta instability</strong> - Beta can change over time</span>
+                        </li>
+                        <li className="flex gap-2">
+                          <span className="text-orange-600">•</span>
+                          <span><strong>Market portfolio</strong> - True market portfolio is unobservable</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1095,10 +1814,166 @@ export default function PortfolioTheory() {
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 border-2 border-indigo-200">
-                    <p className="text-gray-700 text-center">
-                      Content coming soon...
-                    </p>
+                  <div className="space-y-6">
+                    {/* Introduction */}
+                    <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-xl p-6 border-2 border-indigo-300 shadow-lg">
+                      <h3 className="text-2xl font-bold text-indigo-900 mb-4">What is Portfolio Optimization?</h3>
+                      <p className="text-gray-700 leading-relaxed mb-4">
+                        <strong>Portfolio Optimization</strong> is the process of selecting the best portfolio allocation from a set of available assets, given specific investment objectives and constraints. The goal is to maximize return for a given level of risk, or minimize risk for a target return.
+                      </p>
+                      <div className="bg-white rounded-lg p-4 border-2 border-indigo-200">
+                        <p className="text-center font-semibold text-indigo-900 mb-2">The Optimization Problem:</p>
+                        <p className="text-center text-gray-700 text-sm">
+                          Find optimal weights (w<sub>1</sub>, w<sub>2</sub>, ..., w<sub>n</sub>) that either:
+                        </p>
+                        <div className="grid md:grid-cols-2 gap-2 mt-3">
+                          <div className="bg-green-50 rounded p-2 text-center text-sm border border-green-200">
+                            <strong>Minimize</strong> risk for target return
+                          </div>
+                          <div className="bg-blue-50 rounded p-2 text-center text-sm border border-blue-200">
+                            <strong>Maximize</strong> return for target risk
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Optimization Methods */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-purple-200 shadow-md">
+                      <h3 className="text-xl font-bold text-purple-900 mb-4 flex items-center gap-2">
+                        <Target className="w-5 h-5" />
+                        Optimization Approaches
+                      </h3>
+                      <div className="space-y-3">
+                        <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border-2 border-blue-300">
+                          <h4 className="font-bold text-blue-900 mb-2">1. Mean-Variance Optimization (Markowitz)</h4>
+                          <p className="text-sm text-gray-700 mb-2">The classic approach: Find portfolios on the efficient frontier by solving quadratic programming problems.</p>
+                          <div className="bg-white rounded p-2 text-xs font-mono border border-blue-200">
+                            Minimize: w'Σw (portfolio variance)<br/>
+                            Subject to: w'μ = target return, Σw<sub>i</sub> = 1
+                          </div>
+                        </div>
+                        <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 border-2 border-purple-300">
+                          <h4 className="font-bold text-purple-900 mb-2">2. Maximum Sharpe Ratio</h4>
+                          <p className="text-sm text-gray-700">Find the tangency portfolio that maximizes risk-adjusted return (Sharpe Ratio). This is the optimal risky portfolio.</p>
+                        </div>
+                        <div className="bg-gradient-to-r from-pink-50 to-pink-100 rounded-lg p-4 border-2 border-pink-300">
+                          <h4 className="font-bold text-pink-900 mb-2">3. Minimum Variance</h4>
+                          <p className="text-sm text-gray-700">Find the portfolio with the lowest possible risk, regardless of return. Useful for very risk-averse investors.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Common Constraints */}
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-300 shadow-lg">
+                      <h3 className="text-xl font-bold text-green-900 mb-4 flex items-center gap-2">
+                        <Shield className="w-5 h-5" />
+                        Common Optimization Constraints
+                      </h3>
+                      <div className="grid md:grid-cols-2 gap-3">
+                        <div className="bg-white rounded-lg p-3 border border-green-200">
+                          <h5 className="font-bold text-gray-800 mb-1 text-sm">Budget Constraint</h5>
+                          <p className="text-xs text-gray-700 font-mono">Σw<sub>i</sub> = 1 (weights sum to 100%)</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 border border-green-200">
+                          <h5 className="font-bold text-gray-800 mb-1 text-sm">No Short Selling</h5>
+                          <p className="text-xs text-gray-700 font-mono">w<sub>i</sub> ≥ 0 for all i (long-only)</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 border border-green-200">
+                          <h5 className="font-bold text-gray-800 mb-1 text-sm">Position Limits</h5>
+                          <p className="text-xs text-gray-700">Max % in any single asset (e.g., w<sub>i</sub> ≤ 0.20)</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 border border-green-200">
+                          <h5 className="font-bold text-gray-800 mb-1 text-sm">Sector Limits</h5>
+                          <p className="text-xs text-gray-700">Maximum exposure to specific industries</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 border border-green-200">
+                          <h5 className="font-bold text-gray-800 mb-1 text-sm">Turnover Constraints</h5>
+                          <p className="text-xs text-gray-700">Limit trading to reduce transaction costs</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 border border-green-200">
+                          <h5 className="font-bold text-gray-800 mb-1 text-sm">ESG Criteria</h5>
+                          <p className="text-xs text-gray-700">Environmental, Social, Governance requirements</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Practical Challenges */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-orange-200 shadow-md">
+                      <h3 className="text-xl font-bold text-orange-900 mb-4 flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5" />
+                        Practical Challenges in Optimization
+                      </h3>
+                      <div className="space-y-3">
+                        <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                          <h4 className="font-bold text-gray-800 mb-2">1. Estimation Error</h4>
+                          <p className="text-sm text-gray-700">Small errors in estimating expected returns can lead to large changes in optimal weights. Returns are especially hard to forecast accurately.</p>
+                        </div>
+                        <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                          <h4 className="font-bold text-gray-800 mb-2">2. Extreme Positions</h4>
+                          <p className="text-sm text-gray-700">Unconstrained optimization often produces extreme, concentrated positions that aren't practical or prudent.</p>
+                        </div>
+                        <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                          <h4 className="font-bold text-gray-800 mb-2">3. Transaction Costs</h4>
+                          <p className="text-sm text-gray-700">Frequent rebalancing to maintain optimal weights can be expensive due to trading commissions and market impact.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Advanced Techniques */}
+                    <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl p-6 border-2 border-cyan-300 shadow-lg">
+                      <h3 className="text-xl font-bold text-cyan-900 mb-4 flex items-center gap-2">
+                        <Cpu className="w-5 h-5" />
+                        Advanced Optimization Techniques
+                      </h3>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-lg p-4 border border-cyan-200">
+                          <h4 className="font-bold text-cyan-900 mb-2">Black-Litterman Model</h4>
+                          <p className="text-sm text-gray-700">Combines market equilibrium returns with investor views to produce more stable, diversified portfolios.</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border border-cyan-200">
+                          <h4 className="font-bold text-cyan-900 mb-2">Robust Optimization</h4>
+                          <p className="text-sm text-gray-700">Accounts for parameter uncertainty by optimizing for the worst-case scenario within a range of estimates.</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border border-cyan-200">
+                          <h4 className="font-bold text-cyan-900 mb-2">Risk Parity</h4>
+                          <p className="text-sm text-gray-700">Allocates capital so each asset contributes equally to portfolio risk, rather than equal weights.</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border border-cyan-200">
+                          <h4 className="font-bold text-cyan-900 mb-2">Factor-Based Optimization</h4>
+                          <p className="text-sm text-gray-700">Optimizes exposure to risk factors (value, momentum, quality) rather than individual securities.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Best Practices */}
+                    <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+                      <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
+                        <Lightbulb className="w-5 h-5" />
+                        Best Practices for Portfolio Optimization
+                      </h3>
+                      <ul className="space-y-2">
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                          <span><strong>Use shrinkage estimators</strong> for expected returns to reduce estimation error</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                          <span><strong>Apply reasonable constraints</strong> to prevent extreme positions</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                          <span><strong>Reoptimize periodically</strong>, but not too frequently to avoid excessive turnover</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                          <span><strong>Consider transaction costs</strong> in the optimization objective function</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                          <span><strong>Backtest strategies</strong> before implementation to assess out-of-sample performance</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
