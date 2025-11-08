@@ -1378,102 +1378,143 @@ export default function PortfolioTheory() {
                             })()}
                           </div>
 
-                          {/* Correlation/Covariance Matrix */}
+                          {/* Correlation & Covariance Matrices */}
                           {directInputStocks.length >= 2 && (
-                            <div className="bg-white rounded-lg p-4 border-2 border-purple-200">
-                              <div className="flex items-center justify-between mb-3">
-                                <h4 className="font-bold text-purple-900">
-                                  {matrixType === 'correlation' ? 'Correlation Matrix (ρ)' : 'Covariance Matrix (Cov)'}
-                                </h4>
-                                <div className="flex gap-2">
-                                  <button
-                                    onClick={() => setMatrixType('correlation')}
-                                    className={`px-3 py-1 text-sm font-semibold rounded transition-colors ${
-                                      matrixType === 'correlation'
-                                        ? 'bg-purple-600 text-white'
-                                        : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
-                                    }`}
-                                  >
-                                    Correlation
-                                  </button>
-                                  <button
-                                    onClick={() => setMatrixType('covariance')}
-                                    className={`px-3 py-1 text-sm font-semibold rounded transition-colors ${
-                                      matrixType === 'covariance'
-                                        ? 'bg-purple-600 text-white'
-                                        : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
-                                    }`}
-                                  >
-                                    Covariance
-                                  </button>
+                            <div className="space-y-4">
+                              {/* Correlation Matrix */}
+                              <div className="bg-gradient-to-br from-purple-50 via-white to-purple-50 rounded-xl p-5 border-2 border-purple-300 shadow-md">
+                                <div className="flex items-center gap-3 mb-4">
+                                  <div className="w-1 h-8 bg-gradient-to-b from-purple-500 to-purple-700 rounded-full"></div>
+                                  <h4 className="font-bold text-purple-900 text-lg">Correlation Matrix (ρ)</h4>
+                                  <span className="ml-auto px-3 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">Editable</span>
+                                </div>
+
+                                <div className="overflow-x-auto">
+                                  <table className="w-full text-sm border-collapse">
+                                    <thead>
+                                      <tr>
+                                        <th className="p-2 border-2 border-purple-400 bg-gradient-to-br from-purple-100 to-purple-200 font-bold"></th>
+                                        {directInputStocks.map((stock, idx) => (
+                                          <th key={idx} className="p-2 border-2 border-purple-400 bg-gradient-to-br from-purple-100 to-purple-200 font-bold text-purple-900">
+                                            {stock.name}
+                                          </th>
+                                        ))}
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {directInputStocks.map((stockRow, i) => (
+                                        <tr key={i}>
+                                          <td className="p-2 border-2 border-purple-400 bg-gradient-to-br from-purple-100 to-purple-200 font-bold text-purple-900">
+                                            {stockRow.name}
+                                          </td>
+                                          {directInputStocks.map((stockCol, j) => {
+                                            const value = correlationMatrix[i]?.[j] || 0;
+                                            const isEditable = i !== j;
+                                            const isDiagonal = i === j;
+
+                                            return (
+                                              <td key={j} className={`p-1 border border-purple-300 ${
+                                                isDiagonal ? 'bg-purple-200' : i < j ? 'bg-white' : 'bg-purple-50'
+                                              }`}>
+                                                {isEditable && i < j ? (
+                                                  <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="-1"
+                                                    max="1"
+                                                    value={value.toFixed(2)}
+                                                    onChange={(e) => updateCorrelationCell(i, j, e.target.value)}
+                                                    className="w-full px-2 py-1 text-center border-2 border-purple-400 rounded-lg focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-300 font-mono shadow-sm hover:shadow-md transition-all"
+                                                  />
+                                                ) : (
+                                                  <div className={`text-center py-1 font-mono ${
+                                                    isDiagonal ? 'font-bold text-purple-900' : 'text-gray-700'
+                                                  }`}>
+                                                    {value.toFixed(2)}
+                                                  </div>
+                                                )}
+                                              </td>
+                                            );
+                                          })}
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+
+                                <div className="mt-3 bg-purple-50 rounded-lg p-3 border border-purple-200">
+                                  <p className="text-xs text-purple-900 font-semibold mb-2">
+                                    💡 Correlation Properties:
+                                  </p>
+                                  <ul className="text-xs text-gray-700 space-y-1 ml-4">
+                                    <li>• <strong>Diagonal (darker):</strong> Always 1.0 (perfect correlation with itself)</li>
+                                    <li>• <strong>Upper triangle (white):</strong> Editable correlation values</li>
+                                    <li>• <strong>Lower triangle (purple):</strong> Mirrors upper triangle automatically</li>
+                                    <li>• <strong>Range:</strong> -1 (perfect negative) to +1 (perfect positive)</li>
+                                  </ul>
                                 </div>
                               </div>
 
-                              <div className="overflow-x-auto">
-                                <table className="w-full text-sm border-collapse">
-                                  <thead>
-                                    <tr>
-                                      <th className="p-2 border border-purple-300 bg-purple-50 font-bold"></th>
-                                      {directInputStocks.map((stock, idx) => (
-                                        <th key={idx} className="p-2 border border-purple-300 bg-purple-50 font-bold text-purple-900">
-                                          {stock.name}
-                                        </th>
-                                      ))}
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {directInputStocks.map((stockRow, i) => (
-                                      <tr key={i}>
-                                        <td className="p-2 border border-purple-300 bg-purple-50 font-bold text-purple-900">
-                                          {stockRow.name}
-                                        </td>
-                                        {directInputStocks.map((stockCol, j) => {
-                                          const matrix = matrixType === 'correlation' ? correlationMatrix : getCovarianceMatrix();
-                                          const value = matrix[i]?.[j] || 0;
-                                          const isEditable = matrixType === 'correlation' && i !== j;
-                                          const isDiagonal = i === j;
+                              {/* Covariance Matrix */}
+                              <div className="bg-gradient-to-br from-teal-50 via-white to-cyan-50 rounded-xl p-5 border-2 border-teal-300 shadow-md">
+                                <div className="flex items-center gap-3 mb-4">
+                                  <div className="w-1 h-8 bg-gradient-to-b from-teal-500 to-cyan-700 rounded-full"></div>
+                                  <h4 className="font-bold text-teal-900 text-lg">Covariance Matrix (Cov)</h4>
+                                  <span className="ml-auto px-3 py-1 bg-teal-100 text-teal-700 text-xs font-semibold rounded-full">Auto-Calculated</span>
+                                </div>
 
-                                          return (
-                                            <td key={j} className={`p-1 border border-purple-300 ${
-                                              isDiagonal ? 'bg-purple-100' : i < j ? 'bg-white' : 'bg-gray-50'
-                                            }`}>
-                                              {isEditable && i < j ? (
-                                                <input
-                                                  type="number"
-                                                  step="0.01"
-                                                  min="-1"
-                                                  max="1"
-                                                  value={value.toFixed(2)}
-                                                  onChange={(e) => updateCorrelationCell(i, j, e.target.value)}
-                                                  className="w-full px-2 py-1 text-center border border-purple-300 rounded focus:outline-none focus:border-purple-500 font-mono"
-                                                />
-                                              ) : (
-                                                <div className={`text-center py-1 font-mono ${
-                                                  isDiagonal ? 'font-bold text-purple-900' : 'text-gray-700'
-                                                }`}>
-                                                  {value.toFixed(matrixType === 'correlation' ? 2 : 4)}
-                                                </div>
-                                              )}
-                                            </td>
-                                          );
-                                        })}
+                                <div className="overflow-x-auto">
+                                  <table className="w-full text-sm border-collapse">
+                                    <thead>
+                                      <tr>
+                                        <th className="p-2 border-2 border-teal-400 bg-gradient-to-br from-teal-100 to-cyan-200 font-bold"></th>
+                                        {directInputStocks.map((stock, idx) => (
+                                          <th key={idx} className="p-2 border-2 border-teal-400 bg-gradient-to-br from-teal-100 to-cyan-200 font-bold text-teal-900">
+                                            {stock.name}
+                                          </th>
+                                        ))}
                                       </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              </div>
+                                    </thead>
+                                    <tbody>
+                                      {directInputStocks.map((stockRow, i) => (
+                                        <tr key={i}>
+                                          <td className="p-2 border-2 border-teal-400 bg-gradient-to-br from-teal-100 to-cyan-200 font-bold text-teal-900">
+                                            {stockRow.name}
+                                          </td>
+                                          {directInputStocks.map((stockCol, j) => {
+                                            const covMatrix = getCovarianceMatrix();
+                                            const value = covMatrix[i]?.[j] || 0;
+                                            const isDiagonal = i === j;
 
-                              <div className="mt-3 space-y-2">
-                                <p className="text-xs text-gray-600">
-                                  <strong className="text-purple-700">💡 Matrix Properties:</strong>
-                                </p>
-                                <ul className="text-xs text-gray-600 space-y-1 ml-4">
-                                  <li>• Diagonal (darker cells) always equals 1.0 for correlation or variance for covariance</li>
-                                  <li>• Matrix is symmetric - only edit upper triangle (white cells)</li>
-                                  <li>• Lower triangle (gray cells) mirrors upper triangle automatically</li>
-                                  <li>• Correlation range: -1 (perfect negative) to +1 (perfect positive)</li>
-                                  <li>• Covariance is calculated from: Cov(i,j) = ρ(i,j) × σ(i) × σ(j)</li>
-                                </ul>
+                                            return (
+                                              <td key={j} className={`p-1 border border-teal-300 ${
+                                                isDiagonal ? 'bg-teal-200' : i < j ? 'bg-white' : 'bg-teal-50'
+                                              }`}>
+                                                <div className={`text-center py-1 font-mono ${
+                                                  isDiagonal ? 'font-bold text-teal-900' : 'text-gray-700'
+                                                }`}>
+                                                  {value.toFixed(4)}
+                                                </div>
+                                              </td>
+                                            );
+                                          })}
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+
+                                <div className="mt-3 bg-teal-50 rounded-lg p-3 border border-teal-200">
+                                  <p className="text-xs text-teal-900 font-semibold mb-2">
+                                    💡 Covariance Properties:
+                                  </p>
+                                  <ul className="text-xs text-gray-700 space-y-1 ml-4">
+                                    <li>• <strong>Diagonal (darker):</strong> Variance σ² of each stock</li>
+                                    <li>• <strong>Off-diagonal:</strong> Covariance between stock pairs</li>
+                                    <li>• <strong>Formula:</strong> Cov(i,j) = ρ(i,j) × σ(i) × σ(j)</li>
+                                    <li>• <strong>Symmetric:</strong> Cov(i,j) = Cov(j,i)</li>
+                                  </ul>
+                                </div>
                               </div>
                             </div>
                           )}
