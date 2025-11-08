@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   TrendingUp,
+  TrendingDown,
   PieChart,
   BarChart3,
   LineChart as LineChartIcon,
@@ -15,7 +16,17 @@ import {
   Info,
   ChevronDown,
   ChevronUp,
-  Link2
+  Link2,
+  Users,
+  BookOpen,
+  Lightbulb,
+  CheckCircle2,
+  Building2,
+  Briefcase,
+  DollarSign,
+  AlertTriangle,
+  XCircle,
+  Cpu
 } from 'lucide-react';
 import { DisplayEquation } from '../components/MathEquation';
 
