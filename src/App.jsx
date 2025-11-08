@@ -26,6 +26,7 @@ const WACC = lazy(() => import('./pages/WACC'));
 const RiskManagement = lazy(() => import('./pages/RiskManagement'));
 const Derivatives = lazy(() => import('./pages/Derivatives'));
 const Statistics = lazy(() => import('./pages/Statistics'));
+const StockDataAnalyzer = lazy(() => import('./pages/StockDataAnalyzer'));
 
 // Helper component to wrap lazy-loaded pages with error boundary and suspense
 function LazyRoute({ children }) {
@@ -215,6 +216,17 @@ function App() {
                 <LazyRoute>
                   <ProtectedRoute requireSubscription={true}>
                     <Statistics />
+                  </ProtectedRoute>
+                </LazyRoute>
+              }
+            />
+
+            <Route
+              path="/tools/stock-data-analyzer"
+              element={
+                <LazyRoute>
+                  <ProtectedRoute requireSubscription={true}>
+                    <StockDataAnalyzer />
                   </ProtectedRoute>
                 </LazyRoute>
               }

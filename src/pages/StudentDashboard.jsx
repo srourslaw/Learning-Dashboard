@@ -402,6 +402,62 @@ export default function StudentDashboard() {
           </div>
         </div>
 
+        {/* Tools & Resources */}
+        <div className="mb-8">
+          <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <Briefcase className="w-6 h-6 text-indigo-600" />
+            Financial Analysis Tools
+          </h3>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Stock Data Analyzer */}
+            <Link
+              to="/tools/stock-data-analyzer"
+              className="group relative bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105"
+            >
+              {/* Header with gradient */}
+              <div className="h-32 bg-gradient-to-br from-indigo-600 to-purple-600 p-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 opacity-20">
+                  <BarChart3 className="w-32 h-32 transform rotate-12" />
+                </div>
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="p-2 bg-white/20 backdrop-blur rounded-lg">
+                      <BarChart3 className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full shadow-lg">
+                      NEW
+                    </span>
+                  </div>
+                  <p className="text-xs font-semibold text-white/90">Analysis Tool</p>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <h4 className="text-lg font-bold text-gray-800 mb-2">
+                  Australian Stock Data Analyzer
+                </h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  Access real-time ASX data, financial statements, and comprehensive company analysis
+                </p>
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">Price History</span>
+                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">Balance Sheet</span>
+                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Cash Flow</span>
+                  <span className="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded-full">Income Statement</span>
+                </div>
+
+                <div className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
+                  <BarChart3 className="w-4 h-4" />
+                  Launch Analyzer
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
+
         {/* Learning Path Info */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
