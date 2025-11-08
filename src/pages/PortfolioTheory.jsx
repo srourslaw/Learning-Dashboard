@@ -2004,10 +2004,292 @@ export default function PortfolioTheory() {
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-r from-rose-50 to-pink-50 rounded-xl p-6 border-2 border-rose-200">
-                    <p className="text-gray-700 text-center">
-                      Content coming soon...
-                    </p>
+                  <div className="space-y-6">
+                    {/* Introduction */}
+                    <div className="bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 rounded-xl p-6 border-2 border-rose-300 shadow-lg">
+                      <h3 className="text-2xl font-bold text-rose-900 mb-4">Portfolio Performance Analysis</h3>
+                      <p className="text-gray-700 leading-relaxed mb-4">
+                        <strong>Portfolio Analysis</strong> involves evaluating a portfolio's performance using various metrics to assess how well it has achieved its investment objectives. These metrics help investors understand risk-adjusted returns and make informed decisions.
+                      </p>
+                      <div className="bg-white rounded-lg p-4 border-2 border-rose-200">
+                        <p className="text-center font-semibold text-rose-900 mb-2">Key Questions Portfolio Analysis Answers:</p>
+                        <div className="grid md:grid-cols-2 gap-2">
+                          <div className="bg-rose-50 rounded p-2 text-sm">
+                            ✓ Did the portfolio beat its benchmark?
+                          </div>
+                          <div className="bg-pink-50 rounded p-2 text-sm">
+                            ✓ Was the risk level appropriate?
+                          </div>
+                          <div className="bg-purple-50 rounded p-2 text-sm">
+                            ✓ Was the return sufficient for the risk taken?
+                          </div>
+                          <div className="bg-red-50 rounded p-2 text-sm">
+                            ✓ How much value did active management add?
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Sharpe Ratio */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-blue-200 shadow-md">
+                      <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5" />
+                        Sharpe Ratio
+                      </h3>
+                      <p className="text-gray-700 mb-4">
+                        The <strong>Sharpe Ratio</strong> measures excess return per unit of total risk. Higher is better.
+                      </p>
+                      <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-200 mb-4">
+                        <DisplayEquation equation="\\text{Sharpe Ratio} = \\frac{E[R_p] - R_f}{\\sigma_p}" />
+                        <div className="mt-3 grid md:grid-cols-3 gap-2 text-xs">
+                          <div className="bg-white rounded p-2">
+                            <DisplayEquation equation="E[R_p]" /> = Portfolio expected return
+                          </div>
+                          <div className="bg-white rounded p-2">
+                            <DisplayEquation equation="R_f" /> = Risk-free rate
+                          </div>
+                          <div className="bg-white rounded p-2">
+                            <DisplayEquation equation="\\sigma_p" /> = Portfolio standard deviation
+                          </div>
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-3 gap-3">
+                        <div className="bg-red-50 rounded-lg p-3 border border-red-200">
+                          <div className="font-bold text-red-900 mb-1">Sharpe &lt; 1</div>
+                          <p className="text-xs text-gray-700">Sub-optimal. Not enough return for risk taken</p>
+                        </div>
+                        <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
+                          <div className="font-bold text-yellow-900 mb-1">Sharpe = 1-2</div>
+                          <p className="text-xs text-gray-700">Good. Adequate risk-adjusted return</p>
+                        </div>
+                        <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+                          <div className="font-bold text-green-900 mb-1">Sharpe &gt; 2</div>
+                          <p className="text-xs text-gray-700">Excellent. Superior risk-adjusted performance</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Treynor Ratio */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-purple-200 shadow-md">
+                      <h3 className="text-xl font-bold text-purple-900 mb-4 flex items-center gap-2">
+                        <Activity className="w-5 h-5" />
+                        Treynor Ratio
+                      </h3>
+                      <p className="text-gray-700 mb-4">
+                        The <strong>Treynor Ratio</strong> measures excess return per unit of <em>systematic risk</em> (beta). Useful for well-diversified portfolios.
+                      </p>
+                      <div className="bg-purple-50 rounded-lg p-4 border-2 border-purple-200">
+                        <DisplayEquation equation="\\text{Treynor Ratio} = \\frac{E[R_p] - R_f}{\\beta_p}" />
+                        <div className="mt-3 text-xs text-center text-gray-600">
+                          Focuses on <strong>market risk only</strong>, ignoring unsystematic risk
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Jensen's Alpha */}
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-300 shadow-lg">
+                      <h3 className="text-xl font-bold text-green-900 mb-4 flex items-center gap-2">
+                        <Target className="w-5 h-5" />
+                        Jensen's Alpha (α)
+                      </h3>
+                      <p className="text-gray-700 mb-4">
+                        <strong>Jensen's Alpha</strong> measures the excess return of a portfolio over what CAPM predicts. It represents the value added by active management.
+                      </p>
+                      <div className="bg-green-50 rounded-lg p-4 border-2 border-green-200 mb-4">
+                        <DisplayEquation equation="\\alpha = R_p - [R_f + \\beta_p(R_m - R_f)]" />
+                        <div className="mt-3 text-sm text-center text-gray-700">
+                          <DisplayEquation equation="\\alpha = \\text{Actual Return} - \\text{CAPM Expected Return}" />
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-3 gap-3">
+                        <div className="bg-green-100 rounded-lg p-3 border-2 border-green-400">
+                          <div className="font-bold text-green-900 mb-1 flex items-center gap-1">
+                            <DisplayEquation equation="\\alpha > 0" />
+                          </div>
+                          <p className="text-xs text-gray-700"><strong className="text-green-700">Outperformance!</strong> Portfolio beat expectations</p>
+                        </div>
+                        <div className="bg-gray-100 rounded-lg p-3 border-2 border-gray-300">
+                          <div className="font-bold text-gray-900 mb-1 flex items-center gap-1">
+                            <DisplayEquation equation="\\alpha = 0" />
+                          </div>
+                          <p className="text-xs text-gray-700">Fair performance. Matched expectations</p>
+                        </div>
+                        <div className="bg-red-100 rounded-lg p-3 border-2 border-red-300">
+                          <div className="font-bold text-red-900 mb-1 flex items-center gap-1">
+                            <DisplayEquation equation="\\alpha < 0" />
+                          </div>
+                          <p className="text-xs text-gray-700"><strong className="text-red-700">Underperformance.</strong> Portfolio missed expectations</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Information Ratio */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-indigo-200 shadow-md">
+                      <h3 className="text-xl font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5" />
+                        Information Ratio (IR)
+                      </h3>
+                      <p className="text-gray-700 mb-4">
+                        The <strong>Information Ratio</strong> measures consistency of outperformance relative to a benchmark.
+                      </p>
+                      <div className="bg-indigo-50 rounded-lg p-4 border-2 border-indigo-200">
+                        <DisplayEquation equation="\\text{IR} = \\frac{R_p - R_B}{\\sigma(R_p - R_B)}" />
+                        <div className="mt-3 grid md:grid-cols-2 gap-2 text-xs">
+                          <div className="bg-white rounded p-2">
+                            <DisplayEquation equation="R_p - R_B" /> = Excess return vs benchmark
+                          </div>
+                          <div className="bg-white rounded p-2">
+                            <DisplayEquation equation="\\sigma(R_p - R_B)" /> = Tracking error
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-3 bg-indigo-100 rounded-lg p-3 border border-indigo-300">
+                        <p className="text-sm text-indigo-900 text-center">
+                          <strong>IR &gt; 0.5</strong> is considered good, <strong>IR &gt; 1.0</strong> is excellent
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Sortino Ratio */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-orange-200 shadow-md">
+                      <h3 className="text-xl font-bold text-orange-900 mb-4 flex items-center gap-2">
+                        <TrendingDown className="w-5 h-5" />
+                        Sortino Ratio
+                      </h3>
+                      <p className="text-gray-700 mb-4">
+                        The <strong>Sortino Ratio</strong> is similar to Sharpe but only considers <em>downside</em> risk (negative volatility).
+                      </p>
+                      <div className="bg-orange-50 rounded-lg p-4 border-2 border-orange-200">
+                        <DisplayEquation equation="\\text{Sortino Ratio} = \\frac{E[R_p] - R_f}{\\sigma_{\\text{downside}}}" />
+                        <div className="mt-3 text-xs text-center text-gray-600">
+                          More relevant than Sharpe for investors who only care about <strong>downside volatility</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Maximum Drawdown */}
+                    <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-6 border-2 border-red-300 shadow-lg">
+                      <h3 className="text-xl font-bold text-red-900 mb-4 flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5" />
+                        Maximum Drawdown (MDD)
+                      </h3>
+                      <p className="text-gray-700 mb-4">
+                        <strong>Maximum Drawdown</strong> measures the largest peak-to-trough decline in portfolio value. It shows worst-case historical loss.
+                      </p>
+                      <div className="bg-red-50 rounded-lg p-4 border-2 border-red-200">
+                        <DisplayEquation equation="\\text{MDD} = \\frac{\\text{Trough Value} - \\text{Peak Value}}{\\text{Peak Value}}" />
+                      </div>
+                      <div className="mt-4 bg-white rounded-lg p-4 border border-red-200">
+                        <p className="text-sm text-gray-700 mb-2">
+                          <strong className="text-red-800">Example:</strong> Portfolio grows from $100k to $150k (peak), then falls to $120k (trough):
+                        </p>
+                        <div className="bg-red-50 rounded p-3 font-mono text-sm text-center">
+                          <DisplayEquation equation="\\text{MDD} = \\frac{120,000 - 150,000}{150,000} = -20\\%" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* R-Squared */}
+                    <div className="bg-white rounded-xl p-6 border-2 border-cyan-200 shadow-md">
+                      <h3 className="text-xl font-bold text-cyan-900 mb-4 flex items-center gap-2">
+                        <PieChart className="w-5 h-5" />
+                        R-Squared (R²)
+                      </h3>
+                      <p className="text-gray-700 mb-4">
+                        <strong>R-Squared</strong> measures how much of a portfolio's movement can be explained by movements in a benchmark index.
+                      </p>
+                      <div className="bg-cyan-50 rounded-lg p-4 border-2 border-cyan-200 mb-4">
+                        <div className="text-center text-sm mb-2 font-semibold text-cyan-900">
+                          Range: 0 to 1 (or 0% to 100%)
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-3">
+                        <div className="bg-cyan-50 rounded-lg p-3 border border-cyan-200">
+                          <div className="font-bold text-cyan-900 mb-1">R² = 1.0 (100%)</div>
+                          <p className="text-xs text-gray-700">Perfect correlation with benchmark. Essentially an index fund.</p>
+                        </div>
+                        <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                          <div className="font-bold text-blue-900 mb-1">R² = 0.0 (0%)</div>
+                          <p className="text-xs text-gray-700">No correlation. Portfolio moves independently of benchmark.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Comparison Table */}
+                    <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white shadow-lg">
+                      <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                        <Calculator className="w-5 h-5" />
+                        Performance Metrics Comparison
+                      </h3>
+                      <div className="bg-white bg-opacity-20 rounded-lg p-4">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-white border-opacity-30">
+                              <th className="text-left py-2">Metric</th>
+                              <th className="text-left py-2">Risk Measure</th>
+                              <th className="text-left py-2">Best For</th>
+                            </tr>
+                          </thead>
+                          <tbody className="space-y-1">
+                            <tr className="border-b border-white border-opacity-20">
+                              <td className="py-2"><strong>Sharpe Ratio</strong></td>
+                              <td>Total Risk (σ)</td>
+                              <td>All portfolios</td>
+                            </tr>
+                            <tr className="border-b border-white border-opacity-20">
+                              <td className="py-2"><strong>Treynor Ratio</strong></td>
+                              <td>Systematic Risk (β)</td>
+                              <td>Diversified portfolios</td>
+                            </tr>
+                            <tr className="border-b border-white border-opacity-20">
+                              <td className="py-2"><strong>Jensen's Alpha</strong></td>
+                              <td>Systematic Risk (β)</td>
+                              <td>Measuring manager skill</td>
+                            </tr>
+                            <tr className="border-b border-white border-opacity-20">
+                              <td className="py-2"><strong>Sortino Ratio</strong></td>
+                              <td>Downside Risk</td>
+                              <td>Loss-averse investors</td>
+                            </tr>
+                            <tr>
+                              <td className="py-2"><strong>Information Ratio</strong></td>
+                              <td>Tracking Error</td>
+                              <td>Active vs benchmark</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Best Practices */}
+                    <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-xl p-6 border-2 border-green-300 shadow-lg">
+                      <h3 className="text-xl font-bold text-green-900 mb-4 flex items-center gap-2">
+                        <Lightbulb className="w-5 h-5" />
+                        Best Practices for Portfolio Analysis
+                      </h3>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span><strong>Use multiple metrics</strong> - No single measure tells the whole story</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span><strong>Compare to appropriate benchmarks</strong> - Match style and asset class</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span><strong>Consider time period</strong> - Look at 1-year, 3-year, 5-year, and since-inception</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span><strong>Adjust for market conditions</strong> - Bull vs bear markets affect metrics differently</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span><strong>Account for fees and taxes</strong> - After-fee returns are what matter to investors</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
