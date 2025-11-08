@@ -20,7 +20,9 @@ import {
   Loader,
   Info,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  X,
+  Trash2
 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -50,23 +52,18 @@ const AUSTRALIAN_COMPANIES = [
 
 export default function StockDataAnalyzer() {
   const navigate = useNavigate();
-  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [selectedCompanies, setSelectedCompanies] = useState([]); // Changed to array for multi-select
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview'); // overview, prices, income, balance, cashflow
   const [dateRange, setDateRange] = useState('1y'); // 1m, 3m, 6m, 1y, 3y, 5y
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Stock data state
-  const [stockData, setStockData] = useState({
-    quote: null,
-    historicalPrices: [],
-    incomeStatement: [],
-    balanceSheet: [],
-    cashFlow: [],
-    keyMetrics: null
-  });
+  // Portfolio weights (equal weight by default)
+  const [portfolioWeights, setPortfolioWeights] = useState({});
+
+  // Multi-company stock data state (keyed by symbol)
+  const [companiesData, setCompaniesData] = useState({});
 
   // Filter companies based on search
   const filteredCompanies = AUSTRALIAN_COMPANIES.filter(company =>
@@ -122,15 +119,16 @@ export default function StockDataAnalyzer() {
           currency: meta.currency
         };
 
-        setStockData(prev => ({
+        // Store data for this specific company
+        setCompaniesData(prev => ({
           ...prev,
-          quote: quote,
-          historicalPrices: historicalPrices
+          [symbol]: {
+            quote: quote,
+            historicalPrices: historicalPrices,
+            returns: calculateReturns(historicalPrices),
+            company: AUSTRALIAN_COMPANIES.find(c => c.symbol === symbol)
+          }
         }));
-
-        // Fetch financial statements (this would require additional API calls)
-        // For now, we'll generate sample data structure
-        await fetchFinancialStatements(symbol);
       }
 
     } catch (err) {
@@ -258,8 +256,62 @@ export default function StockDataAnalyzer() {
   };
 
   const handleCompanySelect = (company) => {
-    setSelectedCompany(company);
-    fetchStockData(company.symbol);
+    // Toggle company selection
+    const isSelected = selectedCompanies.find(c => c.symbol === company.symbol);
+
+    if (isSelected) {
+      // Remove company
+      setSelectedCompanies(prev => prev.filter(c => c.symbol !== company.symbol));
+      setCompaniesData(prev => {
+        const newData = { ...prev };
+        delete newData[company.symbol];
+        return newData;
+      });
+      setPortfolioWeights(prev => {
+        const newWeights = { ...prev };
+        delete newWeights[company.symbol];
+        return newWeights;
+      });
+    } else {
+      // Add company
+      setSelectedCompanies(prev => [...prev, company]);
+      fetchStockData(company.symbol);
+
+      // Set equal weight by default
+      setPortfolioWeights(prev => {
+        const newCount = selectedCompanies.length + 1;
+        const equalWeight = 1 / newCount;
+        const newWeights = {};
+        selectedCompanies.forEach(c => {
+          newWeights[c.symbol] = equalWeight;
+        });
+        newWeights[company.symbol] = equalWeight;
+        return newWeights;
+      });
+    }
+  };
+
+  const removeCompany = (symbol) => {
+    setSelectedCompanies(prev => prev.filter(c => c.symbol !== symbol));
+    setCompaniesData(prev => {
+      const newData = { ...prev };
+      delete newData[symbol];
+      return newData;
+    });
+
+    // Recalculate equal weights for remaining companies
+    setPortfolioWeights(prev => {
+      const newWeights = { ...prev };
+      delete newWeights[symbol];
+      const remaining = selectedCompanies.filter(c => c.symbol !== symbol);
+      if (remaining.length > 0) {
+        const equalWeight = 1 / remaining.length;
+        remaining.forEach(c => {
+          newWeights[c.symbol] = equalWeight;
+        });
+      }
+      return newWeights;
+    });
   };
 
   const formatCurrency = (value) => {
@@ -277,6 +329,133 @@ export default function StockDataAnalyzer() {
   const formatNumber = (value, decimals = 2) => {
     if (value === null || value === undefined) return 'N/A';
     return value.toLocaleString('en-AU', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  };
+
+  // Calculate returns from historical prices
+  const calculateReturns = (historicalPrices) => {
+    if (!historicalPrices || historicalPrices.length < 2) return [];
+
+    const returns = [];
+    for (let i = 1; i < historicalPrices.length; i++) {
+      const currentPrice = historicalPrices[i].close;
+      const previousPrice = historicalPrices[i - 1].close;
+
+      if (currentPrice !== null && previousPrice !== null && previousPrice !== 0) {
+        const dailyReturn = (currentPrice - previousPrice) / previousPrice;
+        returns.push({
+          date: historicalPrices[i].date,
+          return: dailyReturn,
+          returnPercent: dailyReturn * 100
+        });
+      }
+    }
+    return returns;
+  };
+
+  // Calculate statistics for a stock
+  const calculateStatistics = (returns) => {
+    if (!returns || returns.length === 0) {
+      return { mean: 0, variance: 0, stdDev: 0, annualizedReturn: 0, annualizedRisk: 0 };
+    }
+
+    // Calculate mean (expected return)
+    const mean = returns.reduce((sum, r) => sum + r.return, 0) / returns.length;
+
+    // Calculate variance
+    const squaredDiffs = returns.map(r => Math.pow(r.return - mean, 2));
+    const variance = squaredDiffs.reduce((sum, val) => sum + val, 0) / returns.length;
+
+    // Calculate standard deviation (risk)
+    const stdDev = Math.sqrt(variance);
+
+    // Annualize (assuming 252 trading days)
+    const annualizedReturn = mean * 252;
+    const annualizedRisk = stdDev * Math.sqrt(252);
+
+    return {
+      mean,
+      variance,
+      stdDev,
+      annualizedReturn,
+      annualizedRisk
+    };
+  };
+
+  // Calculate covariance between two stocks
+  const calculateCovariance = (returns1, returns2) => {
+    if (!returns1 || !returns2 || returns1.length === 0 || returns2.length === 0) {
+      return 0;
+    }
+
+    const minLength = Math.min(returns1.length, returns2.length);
+    const mean1 = returns1.slice(0, minLength).reduce((sum, r) => sum + r.return, 0) / minLength;
+    const mean2 = returns2.slice(0, minLength).reduce((sum, r) => sum + r.return, 0) / minLength;
+
+    let covariance = 0;
+    for (let i = 0; i < minLength; i++) {
+      covariance += (returns1[i].return - mean1) * (returns2[i].return - mean2);
+    }
+
+    return covariance / minLength;
+  };
+
+  // Calculate correlation between two stocks
+  const calculateCorrelation = (returns1, returns2) => {
+    const covariance = calculateCovariance(returns1, returns2);
+    const stats1 = calculateStatistics(returns1);
+    const stats2 = calculateStatistics(returns2);
+
+    if (stats1.stdDev === 0 || stats2.stdDev === 0) return 0;
+
+    return covariance / (stats1.stdDev * stats2.stdDev);
+  };
+
+  // Calculate portfolio metrics
+  const calculatePortfolioMetrics = () => {
+    if (selectedCompanies.length === 0) return null;
+
+    const symbols = selectedCompanies.map(c => c.symbol);
+    const weights = symbols.map(symbol => portfolioWeights[symbol] || 0);
+
+    // Calculate portfolio expected return
+    let portfolioReturn = 0;
+    symbols.forEach((symbol, i) => {
+      const data = companiesData[symbol];
+      if (data && data.returns) {
+        const stats = calculateStatistics(data.returns);
+        portfolioReturn += weights[i] * stats.annualizedReturn;
+      }
+    });
+
+    // Calculate portfolio variance
+    let portfolioVariance = 0;
+    for (let i = 0; i < symbols.length; i++) {
+      for (let j = 0; j < symbols.length; j++) {
+        const data_i = companiesData[symbols[i]];
+        const data_j = companiesData[symbols[j]];
+
+        if (data_i && data_j && data_i.returns && data_j.returns) {
+          const cov = i === j
+            ? calculateStatistics(data_i.returns).variance
+            : calculateCovariance(data_i.returns, data_j.returns);
+
+          portfolioVariance += weights[i] * weights[j] * cov * 252; // Annualize
+        }
+      }
+    }
+
+    const portfolioRisk = Math.sqrt(portfolioVariance);
+
+    // Calculate Sharpe Ratio (assuming risk-free rate of 4%)
+    const riskFreeRate = 0.04;
+    const sharpeRatio = portfolioRisk !== 0 ? (portfolioReturn - riskFreeRate) / portfolioRisk : 0;
+
+    return {
+      expectedReturn: portfolioReturn,
+      variance: portfolioVariance,
+      risk: portfolioRisk,
+      sharpeRatio
+    };
   };
 
   return (
@@ -321,17 +500,25 @@ export default function StockDataAnalyzer() {
                   <Building2 className="w-6 h-6 text-white" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-medium text-indigo-100 mb-1">Selected Company</p>
-                  {selectedCompany ? (
+                  <p className="text-sm font-medium text-indigo-100 mb-1">Selected Companies</p>
+                  {selectedCompanies.length > 0 ? (
                     <div>
-                      <p className="text-2xl font-bold text-white">{selectedCompany.name}</p>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="text-indigo-100 font-semibold">{selectedCompany.symbol.replace('.AX', '')}</span>
-                        <span className="px-2 py-1 bg-white/20 rounded-lg text-xs font-medium text-white">{selectedCompany.sector}</span>
+                      <p className="text-2xl font-bold text-white">{selectedCompanies.length} {selectedCompanies.length === 1 ? 'Company' : 'Companies'} Selected</p>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        {selectedCompanies.slice(0, 3).map(company => (
+                          <span key={company.symbol} className="px-2 py-1 bg-white/20 rounded-lg text-xs font-medium text-white">
+                            {company.symbol.replace('.AX', '')}
+                          </span>
+                        ))}
+                        {selectedCompanies.length > 3 && (
+                          <span className="px-2 py-1 bg-white/20 rounded-lg text-xs font-medium text-white">
+                            +{selectedCompanies.length - 3} more
+                          </span>
+                        )}
                       </div>
                     </div>
                   ) : (
-                    <p className="text-xl font-semibold text-white">Click to select an Australian company</p>
+                    <p className="text-xl font-semibold text-white">Click to select Australian companies for portfolio analysis</p>
                   )}
                 </div>
               </div>
@@ -367,43 +554,42 @@ export default function StockDataAnalyzer() {
               <div className="max-h-96 overflow-y-auto">
                 {filteredCompanies.length > 0 ? (
                   <div className="divide-y divide-indigo-100">
-                    {filteredCompanies.map((company) => (
-                      <button
-                        key={company.symbol}
-                        onClick={() => {
-                          handleCompanySelect(company);
-                          setIsDropdownOpen(false);
-                          setSearchQuery('');
-                        }}
-                        className={`w-full p-4 text-left transition-all duration-200 flex items-center justify-between group ${
-                          selectedCompany?.symbol === company.symbol
-                            ? 'bg-indigo-100 hover:bg-indigo-200'
-                            : 'hover:bg-indigo-50'
-                        }`}
-                      >
-                        <div className="flex items-center gap-4 flex-1">
-                          <div className={`p-2 rounded-lg transition-colors ${
-                            selectedCompany?.symbol === company.symbol
-                              ? 'bg-indigo-200'
-                              : 'bg-indigo-100 group-hover:bg-indigo-200'
-                          }`}>
-                            <Building2 className="w-5 h-5 text-indigo-600" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-1">
-                              <span className="font-bold text-gray-900 text-lg">{company.symbol.replace('.AX', '')}</span>
-                              <span className="px-2 py-1 bg-indigo-100 rounded-md text-xs font-medium text-indigo-700">
-                                {company.sector}
-                              </span>
+                    {filteredCompanies.map((company) => {
+                      const isSelected = selectedCompanies.find(c => c.symbol === company.symbol);
+                      return (
+                        <button
+                          key={company.symbol}
+                          onClick={() => handleCompanySelect(company)}
+                          className={`w-full p-4 text-left transition-all duration-200 flex items-center justify-between group ${
+                            isSelected
+                              ? 'bg-indigo-100 hover:bg-indigo-200'
+                              : 'hover:bg-indigo-50'
+                          }`}
+                        >
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className={`p-2 rounded-lg transition-colors ${
+                              isSelected
+                                ? 'bg-indigo-200'
+                                : 'bg-indigo-100 group-hover:bg-indigo-200'
+                            }`}>
+                              <Building2 className="w-5 h-5 text-indigo-600" />
                             </div>
-                            <p className="text-sm text-gray-600 font-medium">{company.name}</p>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-1">
+                                <span className="font-bold text-gray-900 text-lg">{company.symbol.replace('.AX', '')}</span>
+                                <span className="px-2 py-1 bg-indigo-100 rounded-md text-xs font-medium text-indigo-700">
+                                  {company.sector}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-600 font-medium">{company.name}</p>
+                            </div>
                           </div>
-                        </div>
-                        {selectedCompany?.symbol === company.symbol && (
-                          <CheckCircle2 className="w-6 h-6 text-indigo-600 flex-shrink-0" />
-                        )}
-                      </button>
-                    ))}
+                          {isSelected && (
+                            <CheckCircle2 className="w-6 h-6 text-indigo-600 flex-shrink-0" />
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="text-center py-12 text-gray-500">
@@ -427,7 +613,7 @@ export default function StockDataAnalyzer() {
         {loading && (
           <div className="bg-white rounded-2xl p-12 shadow-xl border-2 border-indigo-200 text-center">
             <Loader className="w-16 h-16 mx-auto mb-4 text-indigo-600 animate-spin" />
-            <p className="text-xl font-semibold text-gray-700">Loading stock data for {selectedCompany?.name}...</p>
+            <p className="text-xl font-semibold text-gray-700">Loading stock data...</p>
           </div>
         )}
 
@@ -442,448 +628,28 @@ export default function StockDataAnalyzer() {
           </div>
         )}
 
-        {/* Stock Data Display */}
-        {selectedCompany && stockData.quote && !loading && (
-          <div className="space-y-6">
-            {/* Quick Stats */}
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 shadow-xl text-white">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-3xl font-bold">{selectedCompany.name}</h2>
-                  <p className="text-indigo-100">{stockData.quote.symbol} • {selectedCompany.sector}</p>
-                </div>
-                <button
-                  onClick={() => fetchStockData(selectedCompany.symbol)}
-                  className="p-3 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-all"
-                >
-                  <RefreshCw className="w-6 h-6" />
-                </button>
-              </div>
-
-              <div className="grid md:grid-cols-4 gap-4">
-                <div className="bg-white bg-opacity-10 rounded-lg p-4">
-                  <p className="text-indigo-200 text-sm mb-1">Current Price</p>
-                  <p className="text-3xl font-bold">{formatCurrency(stockData.quote.price)}</p>
-                  <p className={`text-sm mt-1 ${stockData.quote.change >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-                    {stockData.quote.change >= 0 ? '▲' : '▼'} {formatCurrency(Math.abs(stockData.quote.change))} ({formatNumber(Math.abs(stockData.quote.changePercent))}%)
-                  </p>
-                </div>
-                <div className="bg-white bg-opacity-10 rounded-lg p-4">
-                  <p className="text-indigo-200 text-sm mb-1">Day Range</p>
-                  <p className="text-xl font-bold">{formatCurrency(stockData.quote.dayLow)} - {formatCurrency(stockData.quote.dayHigh)}</p>
-                </div>
-                <div className="bg-white bg-opacity-10 rounded-lg p-4">
-                  <p className="text-indigo-200 text-sm mb-1">Volume</p>
-                  <p className="text-xl font-bold">{(stockData.quote.volume / 1000000).toFixed(2)}M</p>
-                </div>
-                <div className="bg-white bg-opacity-10 rounded-lg p-4">
-                  <p className="text-indigo-200 text-sm mb-1">Market Cap</p>
-                  <p className="text-xl font-bold">{stockData.quote.marketCap}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Tabs */}
-            <div className="bg-white rounded-2xl shadow-xl border-2 border-indigo-200">
-              <div className="border-b-2 border-gray-200 px-6">
-                <div className="flex gap-2 -mb-px overflow-x-auto">
-                  {[
-                    { id: 'overview', label: 'Overview', icon: Activity },
-                    { id: 'prices', label: 'Price History', icon: LineChartIcon },
-                    { id: 'income', label: 'Income Statement', icon: DollarSign },
-                    { id: 'balance', label: 'Balance Sheet', icon: BarChart3 },
-                    { id: 'cashflow', label: 'Cash Flow', icon: TrendingUp }
-                  ].map((tab) => {
-                    const Icon = tab.icon;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-6 py-4 border-b-4 transition-all font-semibold ${
-                          activeTab === tab.id
-                            ? 'border-indigo-600 text-indigo-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
-                      >
-                        <Icon className="w-5 h-5" />
-                        {tab.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="p-6">
-                {/* Overview Tab */}
-                {activeTab === 'overview' && stockData.keyMetrics && (
-                  <div className="space-y-6">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">Key Metrics & Ratios</h3>
-
-                    <div className="grid md:grid-cols-3 gap-4">
-                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border-2 border-blue-200">
-                        <p className="text-sm text-gray-600 mb-1">P/E Ratio</p>
-                        <p className="text-3xl font-bold text-blue-900">{stockData.keyMetrics.peRatio}</p>
-                        <p className="text-xs text-gray-500 mt-1">Price to Earnings</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-5 border-2 border-purple-200">
-                        <p className="text-sm text-gray-600 mb-1">P/B Ratio</p>
-                        <p className="text-3xl font-bold text-purple-900">{stockData.keyMetrics.pbRatio}</p>
-                        <p className="text-xs text-gray-500 mt-1">Price to Book</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border-2 border-green-200">
-                        <p className="text-sm text-gray-600 mb-1">Dividend Yield</p>
-                        <p className="text-3xl font-bold text-green-900">{stockData.keyMetrics.dividendYield}%</p>
-                        <p className="text-xs text-gray-500 mt-1">Annual Dividend</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-5 border-2 border-yellow-200">
-                        <p className="text-sm text-gray-600 mb-1">ROE</p>
-                        <p className="text-3xl font-bold text-yellow-900">{stockData.keyMetrics.roe}%</p>
-                        <p className="text-xs text-gray-500 mt-1">Return on Equity</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl p-5 border-2 border-red-200">
-                        <p className="text-sm text-gray-600 mb-1">Debt/Equity</p>
-                        <p className="text-3xl font-bold text-red-900">{stockData.keyMetrics.debtToEquity}</p>
-                        <p className="text-xs text-gray-500 mt-1">Leverage Ratio</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl p-5 border-2 border-cyan-200">
-                        <p className="text-sm text-gray-600 mb-1">Beta</p>
-                        <p className="text-3xl font-bold text-cyan-900">{stockData.keyMetrics.beta}</p>
-                        <p className="text-xs text-gray-500 mt-1">Systematic Risk</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-5 border-2 border-indigo-200">
-                        <p className="text-sm text-gray-600 mb-1">EPS</p>
-                        <p className="text-3xl font-bold text-indigo-900">{formatCurrency(stockData.keyMetrics.eps)}</p>
-                        <p className="text-xs text-gray-500 mt-1">Earnings Per Share</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-teal-50 to-green-50 rounded-xl p-5 border-2 border-teal-200">
-                        <p className="text-sm text-gray-600 mb-1">Current Ratio</p>
-                        <p className="text-3xl font-bold text-teal-900">{stockData.keyMetrics.currentRatio}</p>
-                        <p className="text-xs text-gray-500 mt-1">Liquidity Ratio</p>
-                      </div>
-                      <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-xl p-5 border-2 border-pink-200">
-                        <p className="text-sm text-gray-600 mb-1">ROA</p>
-                        <p className="text-3xl font-bold text-pink-900">{stockData.keyMetrics.roa}%</p>
-                        <p className="text-xs text-gray-500 mt-1">Return on Assets</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Price History Tab */}
-                {activeTab === 'prices' && stockData.historicalPrices.length > 0 && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-2xl font-bold text-gray-900">Price History</h3>
-                      <div className="flex gap-2">
-                        {['1m', '3m', '6m', '1y', '3y', '5y'].map((range) => (
-                          <button
-                            key={range}
-                            onClick={() => {
-                              setDateRange(range);
-                              if (selectedCompany) fetchStockData(selectedCompany.symbol);
-                            }}
-                            className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                              dateRange === range
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                          >
-                            {range.toUpperCase()}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
-                      <ResponsiveContainer width="100%" height={400}>
-                        <AreaChart data={stockData.historicalPrices}>
-                          <defs>
-                            <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.8}/>
-                              <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" />
-                          <XAxis
-                            dataKey="date"
-                            stroke="#6366f1"
-                            tick={{ fill: '#4338ca', fontSize: 11 }}
-                            angle={-45}
-                            textAnchor="end"
-                            height={80}
-                            interval="preserveStartEnd"
-                          />
-                          <YAxis
-                            stroke="#6366f1"
-                            tick={{ fill: '#4338ca' }}
-                            domain={['dataMin - 5', 'dataMax + 5']}
-                            tickFormatter={(value) => `$${value.toFixed(0)}`}
-                          />
-                          <Tooltip
-                            contentStyle={{ backgroundColor: '#fff', border: '2px solid #4f46e5', borderRadius: '8px' }}
-                            formatter={(value) => [formatCurrency(value), 'Price']}
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="close"
-                            stroke="#4f46e5"
-                            strokeWidth={3}
-                            fillOpacity={1}
-                            fill="url(#colorPrice)"
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    {/* Price Data Table */}
-                    <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
-                      <div className="overflow-x-auto max-h-96">
-                        <table className="w-full">
-                          <thead className="bg-indigo-100 sticky top-0">
-                            <tr>
-                              <th className="p-3 text-left text-sm font-bold text-indigo-900">Date</th>
-                              <th className="p-3 text-right text-sm font-bold text-indigo-900">Open</th>
-                              <th className="p-3 text-right text-sm font-bold text-indigo-900">High</th>
-                              <th className="p-3 text-right text-sm font-bold text-indigo-900">Low</th>
-                              <th className="p-3 text-right text-sm font-bold text-indigo-900">Close</th>
-                              <th className="p-3 text-right text-sm font-bold text-indigo-900">Volume</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {stockData.historicalPrices.slice(-20).reverse().map((price, idx) => (
-                              <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                <td className="p-3 text-sm text-gray-900">{price.date}</td>
-                                <td className="p-3 text-sm text-right text-gray-700">{formatCurrency(price.open)}</td>
-                                <td className="p-3 text-sm text-right text-green-700 font-semibold">{formatCurrency(price.high)}</td>
-                                <td className="p-3 text-sm text-right text-red-700 font-semibold">{formatCurrency(price.low)}</td>
-                                <td className="p-3 text-sm text-right text-gray-900 font-bold">{formatCurrency(price.close)}</td>
-                                <td className="p-3 text-sm text-right text-gray-700">{(price.volume / 1000000).toFixed(2)}M</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Income Statement Tab */}
-                {activeTab === 'income' && stockData.incomeStatement.length > 0 && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-2xl font-bold text-gray-900">Income Statement</h3>
-                      <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                        <Download className="w-4 h-4" />
-                        Export
-                      </button>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
-                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={stockData.incomeStatement}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#d1fae5" />
-                          <XAxis
-                            dataKey="period"
-                            stroke="#059669"
-                            tick={{ fill: '#059669' }}
-                          />
-                          <YAxis
-                            stroke="#059669"
-                            tick={{ fill: '#059669' }}
-                            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
-                          />
-                          <Tooltip
-                            contentStyle={{ backgroundColor: '#fff', border: '2px solid #10b981', borderRadius: '8px' }}
-                            formatter={(value) => [formatLargeCurrency(value), '']}
-                          />
-                          <Legend />
-                          <Bar dataKey="revenue" fill="#10b981" name="Revenue" />
-                          <Bar dataKey="grossProfit" fill="#3b82f6" name="Gross Profit" />
-                          <Bar dataKey="netIncome" fill="#8b5cf6" name="Net Income" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    <div className="bg-white rounded-xl border-2 border-gray-200 overflow-x-auto">
-                      <table className="w-full">
-                        <thead className="bg-green-100">
-                          <tr>
-                            <th className="p-3 text-left text-sm font-bold text-green-900">Period</th>
-                            <th className="p-3 text-right text-sm font-bold text-green-900">Revenue</th>
-                            <th className="p-3 text-right text-sm font-bold text-green-900">Cost of Revenue</th>
-                            <th className="p-3 text-right text-sm font-bold text-green-900">Gross Profit</th>
-                            <th className="p-3 text-right text-sm font-bold text-green-900">Operating Expenses</th>
-                            <th className="p-3 text-right text-sm font-bold text-green-900">Operating Income</th>
-                            <th className="p-3 text-right text-sm font-bold text-green-900">Net Income</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {stockData.incomeStatement.map((statement, idx) => (
-                            <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-green-50'}>
-                              <td className="p-3 text-sm font-semibold text-gray-900">{statement.period}</td>
-                              <td className="p-3 text-sm text-right text-gray-900 font-bold">{formatLargeCurrency(statement.revenue)}</td>
-                              <td className="p-3 text-sm text-right text-red-700">{formatLargeCurrency(statement.costOfRevenue)}</td>
-                              <td className="p-3 text-sm text-right text-green-700 font-semibold">{formatLargeCurrency(statement.grossProfit)}</td>
-                              <td className="p-3 text-sm text-right text-red-700">{formatLargeCurrency(statement.operatingExpenses)}</td>
-                              <td className="p-3 text-sm text-right text-blue-700 font-semibold">{formatLargeCurrency(statement.operatingIncome)}</td>
-                              <td className="p-3 text-sm text-right text-purple-700 font-bold">{formatLargeCurrency(statement.netIncome)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-
-                {/* Balance Sheet Tab */}
-                {activeTab === 'balance' && stockData.balanceSheet.length > 0 && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-2xl font-bold text-gray-900">Balance Sheet</h3>
-                      <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                        <Download className="w-4 h-4" />
-                        Export
-                      </button>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 border-2 border-blue-200">
-                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={stockData.balanceSheet}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#dbeafe" />
-                          <XAxis
-                            dataKey="period"
-                            stroke="#0284c7"
-                            tick={{ fill: '#0284c7' }}
-                          />
-                          <YAxis
-                            stroke="#0284c7"
-                            tick={{ fill: '#0284c7' }}
-                            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
-                          />
-                          <Tooltip
-                            contentStyle={{ backgroundColor: '#fff', border: '2px solid #0ea5e9', borderRadius: '8px' }}
-                            formatter={(value) => [formatLargeCurrency(value), '']}
-                          />
-                          <Legend />
-                          <Bar dataKey="totalAssets" fill="#0ea5e9" name="Total Assets" />
-                          <Bar dataKey="totalLiabilities" fill="#f97316" name="Total Liabilities" />
-                          <Bar dataKey="shareholderEquity" fill="#10b981" name="Shareholder Equity" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    <div className="bg-white rounded-xl border-2 border-gray-200 overflow-x-auto">
-                      <table className="w-full">
-                        <thead className="bg-blue-100">
-                          <tr>
-                            <th className="p-3 text-left text-sm font-bold text-blue-900">Period</th>
-                            <th className="p-3 text-right text-sm font-bold text-blue-900">Total Assets</th>
-                            <th className="p-3 text-right text-sm font-bold text-blue-900">Current Assets</th>
-                            <th className="p-3 text-right text-sm font-bold text-blue-900">Cash</th>
-                            <th className="p-3 text-right text-sm font-bold text-blue-900">Total Liabilities</th>
-                            <th className="p-3 text-right text-sm font-bold text-blue-900">Total Debt</th>
-                            <th className="p-3 text-right text-sm font-bold text-blue-900">Shareholder Equity</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {stockData.balanceSheet.map((sheet, idx) => (
-                            <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-blue-50'}>
-                              <td className="p-3 text-sm font-semibold text-gray-900">{sheet.period}</td>
-                              <td className="p-3 text-sm text-right text-gray-900 font-bold">{formatLargeCurrency(sheet.totalAssets)}</td>
-                              <td className="p-3 text-sm text-right text-blue-700">{formatLargeCurrency(sheet.currentAssets)}</td>
-                              <td className="p-3 text-sm text-right text-green-700 font-semibold">{formatLargeCurrency(sheet.cash)}</td>
-                              <td className="p-3 text-sm text-right text-red-700 font-semibold">{formatLargeCurrency(sheet.totalLiabilities)}</td>
-                              <td className="p-3 text-sm text-right text-orange-700">{formatLargeCurrency(sheet.totalDebt)}</td>
-                              <td className="p-3 text-sm text-right text-green-700 font-bold">{formatLargeCurrency(sheet.shareholderEquity)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-
-                {/* Cash Flow Tab */}
-                {activeTab === 'cashflow' && stockData.cashFlow.length > 0 && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-2xl font-bold text-gray-900">Cash Flow Statement</h3>
-                      <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                        <Download className="w-4 h-4" />
-                        Export
-                      </button>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border-2 border-purple-200">
-                      <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={stockData.cashFlow}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f3e8ff" />
-                          <XAxis
-                            dataKey="period"
-                            stroke="#9333ea"
-                            tick={{ fill: '#9333ea' }}
-                          />
-                          <YAxis
-                            stroke="#9333ea"
-                            tick={{ fill: '#9333ea' }}
-                            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`}
-                          />
-                          <Tooltip
-                            contentStyle={{ backgroundColor: '#fff', border: '2px solid #a855f7', borderRadius: '8px' }}
-                            formatter={(value) => [formatLargeCurrency(value), '']}
-                          />
-                          <Legend />
-                          <Line type="monotone" dataKey="operatingCashFlow" stroke="#10b981" strokeWidth={3} name="Operating Cash Flow" />
-                          <Line type="monotone" dataKey="investingCashFlow" stroke="#ef4444" strokeWidth={3} name="Investing Cash Flow" />
-                          <Line type="monotone" dataKey="financingCashFlow" stroke="#3b82f6" strokeWidth={3} name="Financing Cash Flow" />
-                          <Line type="monotone" dataKey="freeCashFlow" stroke="#a855f7" strokeWidth={3} name="Free Cash Flow" />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    <div className="bg-white rounded-xl border-2 border-gray-200 overflow-x-auto">
-                      <table className="w-full">
-                        <thead className="bg-purple-100">
-                          <tr>
-                            <th className="p-3 text-left text-sm font-bold text-purple-900">Period</th>
-                            <th className="p-3 text-right text-sm font-bold text-purple-900">Operating Cash Flow</th>
-                            <th className="p-3 text-right text-sm font-bold text-purple-900">Investing Cash Flow</th>
-                            <th className="p-3 text-right text-sm font-bold text-purple-900">Financing Cash Flow</th>
-                            <th className="p-3 text-right text-sm font-bold text-purple-900">Capital Expenditures</th>
-                            <th className="p-3 text-right text-sm font-bold text-purple-900">Free Cash Flow</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {stockData.cashFlow.map((flow, idx) => (
-                            <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-purple-50'}>
-                              <td className="p-3 text-sm font-semibold text-gray-900">{flow.period}</td>
-                              <td className="p-3 text-sm text-right text-green-700 font-bold">{formatLargeCurrency(flow.operatingCashFlow)}</td>
-                              <td className="p-3 text-sm text-right text-red-700 font-semibold">{formatLargeCurrency(flow.investingCashFlow)}</td>
-                              <td className="p-3 text-sm text-right text-blue-700 font-semibold">{formatLargeCurrency(flow.financingCashFlow)}</td>
-                              <td className="p-3 text-sm text-right text-orange-700">{formatLargeCurrency(flow.capitalExpenditures)}</td>
-                              <td className="p-3 text-sm text-right text-purple-700 font-bold">{formatLargeCurrency(flow.freeCashFlow)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-              </div>
+        {/* Portfolio Analysis Display */}
+        {selectedCompanies.length > 0 && !loading && (
+        {/* Portfolio Analysis Display */}
+        {selectedCompanies.length > 0 && !loading && (
+          <div className="space-y-8">
+            <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-indigo-200">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Portfolio Analysis Coming Soon</h2>
+              <p className="text-gray-600">Selected {selectedCompanies.length} companies. Full portfolio analysis UI will be implemented next.</p>
             </div>
           </div>
         )}
 
-        {/* No Company Selected State */}
-        {!selectedCompany && !loading && (
+        {/* No Companies Selected State */}
+        {selectedCompanies.length === 0 && !loading && (
           <div className="bg-white rounded-2xl p-12 shadow-xl border-2 border-indigo-200 text-center">
             <Building2 className="w-24 h-24 mx-auto mb-6 text-indigo-300" />
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">Select a Company to Begin</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Build Your Portfolio</h3>
             <p className="text-gray-600 max-w-md mx-auto">
-              Choose any Australian company from the list above to view comprehensive financial data,
-              including real-time prices, financial statements, and key metrics.
+              Select multiple Australian companies from the dropdown above to analyze portfolio performance.
             </p>
           </div>
+        )}          </div>
         )}
       </div>
     </div>
